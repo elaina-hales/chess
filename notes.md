@@ -8,8 +8,7 @@
   - return a collection of all the valid moves
   - don't subclass the chess piece
   - to get a PieceType use PieceType.QUEEN etc
-  - create a new class called PieceMovesCalculator and 
+  - create a new interface called PieceMovesCalculator 
   - pieceMoves checks pieceType and then creates an instance of it accordingly
   - if statements in the ChessPiece class
-  - PieceMovesCalculator is one interface (calculator) and then the KingMovesCalculator is another class that calls PieceMovesCalculator
-  - 
+  - PieceMovesCalculator is one interface (calculator) and then the KingMovesCalculator is a class that calls PieceMovesCalculator
