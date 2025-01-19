@@ -7,4 +7,6 @@ public interface PieceMovesCalculator {
     // public <classname> implements <interface>
     // use @override in them
 
+    void getMoves();
+
 }

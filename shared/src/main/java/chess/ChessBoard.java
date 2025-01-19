@@ -43,9 +43,10 @@ public class ChessBoard {
      */
     public void resetBoard() {
         // set the whole board to null and then add in the pieces one by one
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j < 8; j++) {
-                squares[i][j] = null;
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++) {
+                ChessPosition temp = new ChessPosition(i,j);
+                addPiece(temp, null);
             }
         }
         ChessPiece b_rook = new ChessPiece(ChessGame.TeamColor.BLACK, ROOK);
