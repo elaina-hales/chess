@@ -137,6 +137,15 @@ public class ChessBoard {
         addPiece(w_pawn5, w_pawn);
         addPiece(w_pawn6, w_pawn);
         addPiece(w_pawn7, w_pawn);
+
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++) {
+                ChessPosition temp = new ChessPosition(i,j);
+                System.out.print(i);
+                System.out.print(j);
+                System.out.println(getPiece(temp));
+            }
+        }
     }
 
     @Override
