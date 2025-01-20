@@ -54,24 +54,23 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         //throw new RuntimeException("Not implemented");
         // return a collection of end positions
-//        if (type == PieceType.KING) {
-//           //return PieceMovesCalculator(board, myPosition, type);
-//        }
-//        else if (type == PieceType.QUEEN){
-//
-//        }
-//        else if (type == PieceType.BISHOP){
-//
-//        }
-//        else if (type == PieceType.KNIGHT){
-//
-//        }
-//        else if (type == PieceType.ROOK){
-//
-//        }
-//        else if (type == PieceType.PAWN){
-//
-//        }
+        if (type == PieceType.KING) {
+        }
+        else if (type == PieceType.QUEEN){
+
+        }
+        else if (type == PieceType.BISHOP){
+
+        }
+        else if (type == PieceType.KNIGHT){
+
+        }
+        else if (type == PieceType.ROOK){
+            return RookCalculator.getMoves(pieceColor, type, myPosition, board);
+        }
+        else if (type == PieceType.PAWN){
+
+        }
         return new ArrayList<>();
     }
 

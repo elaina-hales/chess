@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Collection;
+
 public interface PieceMovesCalculator {
 
     // declare functions to be used
@@ -7,6 +9,6 @@ public interface PieceMovesCalculator {
     // public <classname> implements <interface>
     // use @override in them
 
-    void getMoves();
+    Collection<ChessMove> getMoves();
 
 }
