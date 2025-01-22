@@ -7,71 +7,9 @@ public class KingCalculator implements PieceMovesCalculator {
     public KingCalculator(){
     }
 
-    public Collection<ChessMove> forwardMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
-        for (int i = myRow+1; i < 9; i++){
-            ChessPosition endPos = new ChessPosition(i, myCol);
-            ChessPiece curPiece = board.getPiece(endPos);
-            if (curPiece != null) {
-                if (curPiece.getTeamColor().equals(teamColor)) {
-                    return moves;
-                } else {
-                    ChessMove cur = new ChessMove(myPosition, endPos, null);
-                    moves.add(cur);
-                    return moves;
-                }
-            } else {
-                ChessMove cur = new ChessMove(myPosition, endPos, null);
-                moves.add(cur);
-            }
-        }
-        return moves;
-    }
-
-
-    public Collection<ChessMove> backwardMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
-        for (int i = myRow-1; i >= 1 ; i--){
-            ChessPosition endPos = new ChessPosition(i, myCol);
-            ChessPiece curPiece = board.getPiece(endPos);
-            if (curPiece != null) {
-                if (curPiece.getTeamColor().equals(teamColor)) {
-                    return moves;
-                } else {
-                    ChessMove cur = new ChessMove(myPosition, endPos, null);
-                    moves.add(cur);
-                    return moves;
-                }
-            } else {
-                ChessMove cur = new ChessMove(myPosition, endPos, null);
-                moves.add(cur);
-            }
-        }
-        return moves;
-    }
-
-
-    public Collection<ChessMove> rightMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
-        for (int i = myCol+1; i < 9; i++){
-            ChessPosition endPos = new ChessPosition(myRow, i);
-            ChessPiece curPiece = board.getPiece(endPos);
-            if (curPiece != null) {
-                if (curPiece.getTeamColor().equals(teamColor)) {
-                    return moves;
-                } else {
-                    ChessMove cur = new ChessMove(myPosition, endPos, null);
-                    moves.add(cur);
-                    return moves;
-                }
-            } else {
-                ChessMove cur = new ChessMove(myPosition, endPos, null);
-                moves.add(cur);
-            }
-        }
-        return moves;
-    }
-
-    public Collection<ChessMove> leftMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
-        for (int i = myCol-1; i >= 1; i--){
-            ChessPosition endPos = new ChessPosition(myRow, i);
+    public Collection<ChessMove> movesHelp(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+        if ((myCol >= 1) && (myCol < 9) && (myRow >= 1) && (myRow < 9)) {
+            ChessPosition endPos = new ChessPosition(myRow, myCol-1);
             ChessPiece curPiece = board.getPiece(endPos);
             if (curPiece != null) {
                 if (curPiece.getTeamColor().equals(teamColor)) {
@@ -94,10 +32,14 @@ public class KingCalculator implements PieceMovesCalculator {
         Collection<ChessMove> moves = new ArrayList<>();
         int myCol = myPosition.getColumn();
         int myRow = myPosition.getRow();
-        Collection<ChessMove> f_moves = forwardMoves(teamColor, board, myPosition, myRow, myCol, moves);
-        Collection<ChessMove> b_moves = backwardMoves(teamColor, board, myPosition, myRow, myCol, f_moves);
-        Collection<ChessMove> r_moves = rightMoves(teamColor, board, myPosition, myRow, myCol, b_moves);
-        Collection<ChessMove> all_moves = leftMoves(teamColor, board, myPosition, myRow, myCol, r_moves);
+        Collection<ChessMove> moves1 = movesHelp(teamColor, board, myPosition, myRow+1, myCol, moves);
+        Collection<ChessMove> moves2 = movesHelp(teamColor, board, myPosition, myRow-1, myCol, moves1);
+        Collection<ChessMove> moves3 = movesHelp(teamColor, board, myPosition, myRow+1, myCol+1, moves2);
+        Collection<ChessMove> moves4 = movesHelp(teamColor, board, myPosition, myRow-1, myCol-1, moves3);
+        Collection<ChessMove> moves5 = movesHelp(teamColor, board, myPosition, myRow+1, myCol-1, moves4);
+        Collection<ChessMove> moves6 = movesHelp(teamColor, board, myPosition, myRow-1, myCol+1, moves5);
+        Collection<ChessMove> moves7 = movesHelp(teamColor, board, myPosition, myRow, myCol+1, moves6);
+        Collection<ChessMove> all_moves = movesHelp(teamColor, board, myPosition, myRow, myCol-1, moves7);
         return all_moves;
     }
 
