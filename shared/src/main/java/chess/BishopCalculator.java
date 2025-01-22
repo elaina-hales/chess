@@ -2,15 +2,16 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-public class RookCalculator implements PieceMovesCalculator {
-    public RookCalculator(){
+public class BishopCalculator implements PieceMovesCalculator {
+    public BishopCalculator(){
     }
 
-    public Collection<ChessMove> forwardMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
-        for (int i = myRow+1; i < 9; i++){
-            ChessPosition endPos = new ChessPosition(i, myCol);
+    public Collection<ChessMove> forwardRightMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+        int tempCol = myCol+1;
+        int tempRow = myRow+1;
+        while ((tempCol < 9) && (tempRow < 9)) {
+            ChessPosition endPos = new ChessPosition(tempRow, tempCol);
             ChessPiece curPiece = board.getPiece(endPos);
             if (curPiece != null) {
                 if (curPiece.getTeamColor().equals(teamColor)) {
@@ -24,14 +25,17 @@ public class RookCalculator implements PieceMovesCalculator {
                 ChessMove cur = new ChessMove(myPosition, endPos, null);
                 moves.add(cur);
             }
+            tempCol++;
+            tempRow++;
         }
         return moves;
     }
 
-
-    public Collection<ChessMove> backwardMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
-        for (int i = myRow-1; i >= 1 ; i--){
-            ChessPosition endPos = new ChessPosition(i, myCol);
+    public Collection<ChessMove> forwardLeftMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves) {
+        int tempCol = myCol - 1;
+        int tempRow = myRow + 1;
+        while ((tempCol >= 1) && (tempRow < 9)) {
+            ChessPosition endPos = new ChessPosition(tempRow, tempCol);
             ChessPiece curPiece = board.getPiece(endPos);
             if (curPiece != null) {
                 if (curPiece.getTeamColor().equals(teamColor)) {
@@ -45,14 +49,18 @@ public class RookCalculator implements PieceMovesCalculator {
                 ChessMove cur = new ChessMove(myPosition, endPos, null);
                 moves.add(cur);
             }
+            tempCol--;
+            tempRow++;
         }
         return moves;
     }
 
 
-    public Collection<ChessMove> rightMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
-        for (int i = myCol+1; i < 9; i++){
-            ChessPosition endPos = new ChessPosition(myRow, i);
+    public Collection<ChessMove> backLeftMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+        int tempCol = myCol-1;
+        int tempRow = myRow-1;
+        while ((tempCol >= 1) && (tempRow >= 1)) {
+            ChessPosition endPos = new ChessPosition(tempRow, tempCol);
             ChessPiece curPiece = board.getPiece(endPos);
             if (curPiece != null) {
                 if (curPiece.getTeamColor().equals(teamColor)) {
@@ -66,13 +74,18 @@ public class RookCalculator implements PieceMovesCalculator {
                 ChessMove cur = new ChessMove(myPosition, endPos, null);
                 moves.add(cur);
             }
+            tempCol--;
+            tempRow--;
         }
         return moves;
     }
 
-    public Collection<ChessMove> leftMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
-        for (int i = myCol-1; i >= 1; i--){
-            ChessPosition endPos = new ChessPosition(myRow, i);
+
+    public Collection<ChessMove> backRightMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+        int tempCol = myCol+1;
+        int tempRow = myRow-1;
+        while ((tempCol < 9) && (tempRow >= 1)) {
+            ChessPosition endPos = new ChessPosition(tempRow, tempCol);
             ChessPiece curPiece = board.getPiece(endPos);
             if (curPiece != null) {
                 if (curPiece.getTeamColor().equals(teamColor)) {
@@ -86,19 +99,21 @@ public class RookCalculator implements PieceMovesCalculator {
                 ChessMove cur = new ChessMove(myPosition, endPos, null);
                 moves.add(cur);
             }
+            tempCol++;
+            tempRow--;
         }
         return moves;
     }
 
-    @Override
+   @Override
     public Collection<ChessMove> getMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
         int myCol = myPosition.getColumn();
         int myRow = myPosition.getRow();
-        Collection<ChessMove> f_moves = forwardMoves(teamColor, board, myPosition, myRow, myCol, moves);
-        Collection<ChessMove> b_moves = backwardMoves(teamColor, board, myPosition, myRow, myCol, f_moves);
-        Collection<ChessMove> r_moves = rightMoves(teamColor, board, myPosition, myRow, myCol, b_moves);
-        Collection<ChessMove> all_moves = leftMoves(teamColor, board, myPosition, myRow, myCol, r_moves);
+        Collection<ChessMove> fr_moves = forwardRightMoves(teamColor, board, myPosition, myRow, myCol, moves);
+        Collection<ChessMove> fl_moves = forwardLeftMoves(teamColor, board, myPosition, myRow, myCol, fr_moves);
+        Collection<ChessMove> bl_moves = backLeftMoves(teamColor, board, myPosition, myRow, myCol, fl_moves);
+        Collection<ChessMove> all_moves = backRightMoves(teamColor, board, myPosition, myRow, myCol, bl_moves);
         return all_moves;
     }
 
