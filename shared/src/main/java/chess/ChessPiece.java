@@ -60,7 +60,7 @@ public class ChessPiece {
             case BISHOP -> new BishopCalculator();
             case KNIGHT -> new KnightCalculator();
             case ROOK -> new RookCalculator();
-            case PAWN -> null;
+            case PAWN -> new PawnCalculator();
         };
         return moves.getMoves(pieceColor, board, myPosition);
     }
