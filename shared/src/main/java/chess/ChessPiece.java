@@ -54,7 +54,6 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         //throw new RuntimeException("Not implemented");
         // return a collection of end positions
-        System.out.println(board.toString());
         PieceMovesCalculator moves = switch(getPieceType()){
             case KING -> new KingCalculator();
             case QUEEN -> new QueenCalculator();
