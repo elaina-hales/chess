@@ -138,6 +138,7 @@ public class ChessBoard {
         addPiece(w_pawn5, w_pawn);
         addPiece(w_pawn6, w_pawn);
         addPiece(w_pawn7, w_pawn);
+
     }
 
     @Override
@@ -157,7 +158,7 @@ public class ChessBoard {
     @Override
     public String toString() {
         return "ChessBoard{" +
-                "squares=" + Arrays.toString(squares) +
+                "squares=" + Arrays.deepToString(squares) +
                 '}';
     }
 }

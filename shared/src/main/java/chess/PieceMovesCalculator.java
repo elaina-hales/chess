@@ -9,6 +9,5 @@ public interface PieceMovesCalculator {
     // public <classname> implements <interface>
     // use @override in them
 
-    Collection<ChessMove> getMoves();
-
+    Collection<ChessMove> getMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition);
 }

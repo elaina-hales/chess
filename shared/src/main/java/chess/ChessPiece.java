@@ -12,8 +12,8 @@ import java.util.Objects;
  */
 public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
-    private final ChessPiece.PieceType type;
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+    private final PieceType type;
+    public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
     }
@@ -54,24 +54,16 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         //throw new RuntimeException("Not implemented");
         // return a collection of end positions
-        if (type == PieceType.KING) {
-        }
-        else if (type == PieceType.QUEEN){
-
-        }
-        else if (type == PieceType.BISHOP){
-
-        }
-        else if (type == PieceType.KNIGHT){
-
-        }
-        else if (type == PieceType.ROOK){
-            return RookCalculator.getMoves(pieceColor, type, myPosition, board);
-        }
-        else if (type == PieceType.PAWN){
-
-        }
-        return new ArrayList<>();
+        System.out.println(board.toString());
+        PieceMovesCalculator moves = switch(getPieceType()){
+            case KING -> null;
+            case QUEEN -> null;
+            case BISHOP -> null;
+            case KNIGHT -> null;
+            case ROOK -> new RookCalculator();
+            case PAWN -> null;
+        };
+        return moves.getMoves(pieceColor, board, myPosition);
     }
 
     @Override
