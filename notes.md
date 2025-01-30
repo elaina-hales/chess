@@ -17,4 +17,3 @@
 - valid moves -- delegate to chess piece classes
 - remove movements that thought could make but may be check moves
 - Stalemate: no possible moves that would not put my king in check
-- 
