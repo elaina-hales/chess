@@ -12,3 +12,9 @@
   - pieceMoves checks pieceType and then creates an instance of it accordingly
   - if statements in the ChessPiece class
   - PieceMovesCalculator is one interface (calculator) and then the KingMovesCalculator is a class that calls PieceMovesCalculator
+
+### Phase 1:
+- valid moves -- delegate to chess piece classes
+- remove movements that thought could make but may be check moves
+- Stalemate: no possible moves that would not put my king in check
+- 

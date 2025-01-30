@@ -52,7 +52,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        //throw new RuntimeException("Not implemented");
+        // throw new RuntimeException("Not implemented");
         // return a collection of end positions
         PieceMovesCalculator moves = switch(getPieceType()){
             case KING -> new KingCalculator();
