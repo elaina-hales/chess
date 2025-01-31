@@ -182,12 +182,14 @@ public class ChessGame {
         if (isInCheck(teamColor)) {
             return false;
         }
+        // to check if the move would put the king in check, send that new position to offending pieces instead
         for (int i = 1; i < 9; i++){
             for (int j = 1; j < 9; j++){
                 ChessPosition currentPosition = new ChessPosition(i,j);
                 ChessPiece currentPiece = chessBoard.getPiece(currentPosition);
                 if (currentPiece != null) {
                     if (currentPiece.getTeamColor().equals(teamColor)){
+                        Collection<ChessMove> moves = currentPiece.pieceMoves(chessBoard, currentPosition);
                         if (!currentPiece.pieceMoves(chessBoard, currentPosition).isEmpty()) {
                             return false;
                         }
