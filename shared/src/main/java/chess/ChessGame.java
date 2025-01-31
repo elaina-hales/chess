@@ -12,7 +12,7 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessGame {
-    private ChessBoard chessBoard;
+    private ChessBoard chessBoard = new ChessBoard();
     private boolean whiteTeamTurn = true;
     public ChessGame() {
 
@@ -75,9 +75,9 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if (validMoves(move.getStartPosition()).contains(move)){
-            // make the move
-        }
+//        if (validMoves(move.getStartPosition()).contains(move)){
+//            // make the move
+//        }
     }
 
     public ChessPosition getKingPosition(TeamColor teamColor){
@@ -112,9 +112,8 @@ public class ChessGame {
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
-    public Collection<ChessMove> getOffendingPieces(TeamColor teamColor){
+    public Collection<ChessMove> getOffendingPieces(TeamColor teamColor, ChessPosition kingPosition){
         Collection<ChessMove> offensiveMoves = new ArrayList<>();
-        ChessPosition kingPosition = getKingPosition(teamColor);
         for (int i = 1; i < 9; i++){
             for (int j = 1; j < 9; j++) {
                 ChessPosition currentPosition = new ChessPosition(i,j);
@@ -133,7 +132,8 @@ public class ChessGame {
 
     public boolean isInCheck(TeamColor teamColor) {
         // get the moves of all the pieces and see if the king is in those moves
-        if (getOffendingPieces(teamColor).isEmpty()){
+        ChessPosition kingPosition = getKingPosition(teamColor);
+        if (getOffendingPieces(teamColor, kingPosition).isEmpty()){
             return false;
         }
         return true;
@@ -147,6 +147,21 @@ public class ChessGame {
      */
 
 
+    public boolean canKingMove(TeamColor teamColor, Collection<ChessMove> kingMoves, ChessPiece king, ChessPosition kingPosition){
+        Collection<ChessMove> tmpMoves = king.pieceMoves(chessBoard, kingPosition);
+        for (ChessMove move : kingMoves){
+            Collection<ChessMove> offendingMoves = getOffendingPieces(teamColor, move.getEndPosition());
+            for (ChessMove offensiveMove : offendingMoves) {
+                if (move.getEndPosition().equals(offensiveMove.getEndPosition())) {
+                    tmpMoves.remove(move);
+                }
+            }
+        }
+        if (tmpMoves.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
 
     public boolean isInCheckmate(TeamColor teamColor) {
         if (!isInCheck(teamColor)) {
@@ -155,20 +170,27 @@ public class ChessGame {
             ChessPosition kingPosition = getKingPosition(teamColor);
             ChessPiece king = chessBoard.getPiece(kingPosition);
             Collection<ChessMove> kingMoves = king.pieceMoves(chessBoard, kingPosition);
-            // get offending pieces
-            Collection<ChessMove> offendingMoves = getOffendingPieces(teamColor);
-
-//            for (ChessPiece piece : offendingMoves) {
-//                piece.pieceMoves(chessBoard, );
-//            }
-
-
-//            if (kingMoves.isEmpty()){
-//                if ()
-//            }
-            return false;
+            if (!canKingMove(teamColor, kingMoves, king, kingPosition)) {
+                Collection<ChessMove> offendingMoves = getOffendingPieces(teamColor, kingPosition);
+                for (int i = 1; i < 9; i++) {
+                    for (int j = 1; j < 9; j++) {
+                        ChessPosition currentPosition = new ChessPosition(i, j);
+                        ChessPiece currentPiece = chessBoard.getPiece(currentPosition);
+                        if (currentPiece != null && currentPiece.getTeamColor().equals(teamColor)) {
+                            Collection<ChessMove> pieceMoves = currentPiece.pieceMoves(chessBoard, currentPosition);
+                            for (ChessMove move : offendingMoves) {
+                                for (ChessMove goodMove : pieceMoves) {
+                                    if (move.getStartPosition().equals(goodMove.getEndPosition())) {
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
-        // if the king is in danger, no move a piece could make to get the king out
+        return true;
     }
 
     /**
@@ -179,18 +201,21 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        ChessPosition kingPosition = getKingPosition(teamColor);
         if (isInCheck(teamColor)) {
             return false;
-        }
-        // to check if the move would put the king in check, send that new position to offending pieces instead
-        for (int i = 1; i < 9; i++){
-            for (int j = 1; j < 9; j++){
-                ChessPosition currentPosition = new ChessPosition(i,j);
-                ChessPiece currentPiece = chessBoard.getPiece(currentPosition);
-                if (currentPiece != null) {
-                    if (currentPiece.getTeamColor().equals(teamColor)){
+        } else {
+            for (int i = 1; i < 9; i++) {
+                for (int j = 1; j < 9; j++) {
+                    ChessPosition currentPosition = new ChessPosition(i, j);
+                    ChessPiece currentPiece = chessBoard.getPiece(currentPosition);
+                    if (currentPiece != null && currentPiece.getTeamColor().equals(teamColor)) {
                         Collection<ChessMove> moves = currentPiece.pieceMoves(chessBoard, currentPosition);
-                        if (!currentPiece.pieceMoves(chessBoard, currentPosition).isEmpty()) {
+                        if (currentPosition.equals(kingPosition)) {
+                            if (canKingMove(teamColor, moves, currentPiece, kingPosition)){
+                                return false;
+                            }
+                        } else if (!moves.isEmpty()) {
                             return false;
                         }
                     }
