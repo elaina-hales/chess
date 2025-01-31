@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -80,25 +81,29 @@ public class ChessGame {
     }
 
     public ChessPosition getKingPosition(TeamColor teamColor){
-        for (int i = 0; i < 9; i++){
-            for (int j = 0; j < 9; j++) {
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++) {
                 ChessPosition currentPosition = new ChessPosition(i,j);
                 ChessPiece currentPiece = chessBoard.getPiece(currentPosition);
-                if ((currentPiece.getPieceType() == ChessPiece.PieceType.KING) && (currentPiece.getTeamColor() == teamColor)){
-                    return currentPosition;
+                if (currentPiece != null){
+                    if ((currentPiece.getPieceType() == ChessPiece.PieceType.KING) && (currentPiece.getTeamColor() == teamColor)){
+                        return currentPosition;
+                    }
                 }
             }
         }
-        return new ChessPosition(0,0);
+        return null;
     }
 
-    public boolean containsKingPos(Collection<ChessMove> moves, ChessPosition kingPos){
-        for (ChessMove move : moves) {
-            if (move.getEndPosition() == kingPos) {
-                return true;
+    public ChessMove getMoveContainsKingPos(Collection<ChessMove> moves, ChessPosition kingPos){
+        List<ChessMove> moveList = new ArrayList<>(moves);
+        for (int i = 0; i < moveList.size(); i++){
+            ChessMove move = moveList.get(i);
+            if (move.getEndPosition().equals(kingPos)) {
+                return move;
             }
         }
-        return false;
+        return null;
     }
 
     /**
@@ -107,20 +112,31 @@ public class ChessGame {
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
-    public boolean isInCheck(TeamColor teamColor) {
-        // get the moves of all the pieces and see if the king is in those moves
+    public Collection<ChessMove> getOffendingPieces(TeamColor teamColor){
+        Collection<ChessMove> offensiveMoves = new ArrayList<>();
         ChessPosition kingPosition = getKingPosition(teamColor);
-        for (int i = 0; i < 9; i++){
-            for (int j = 0; j < 9; j++) {
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++) {
                 ChessPosition currentPosition = new ChessPosition(i,j);
                 ChessPiece currentPiece = chessBoard.getPiece(currentPosition);
-                Collection<ChessMove> moves = currentPiece.pieceMoves(chessBoard, currentPosition);
-                if (containsKingPos(moves, kingPosition)){
-                    return true;
+                if (currentPiece != null){
+                    Collection<ChessMove> moves = currentPiece.pieceMoves(chessBoard, currentPosition);
+                    ChessMove offendingMove = getMoveContainsKingPos(moves, kingPosition);
+                    if (offendingMove != null){
+                        offensiveMoves.add(offendingMove);
+                    }
                 }
             }
         }
-        return false;
+        return offensiveMoves;
+    }
+
+    public boolean isInCheck(TeamColor teamColor) {
+        // get the moves of all the pieces and see if the king is in those moves
+        if (getOffendingPieces(teamColor).isEmpty()){
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -130,6 +146,8 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
 
+
+
     public boolean isInCheckmate(TeamColor teamColor) {
         if (!isInCheck(teamColor)) {
             return false;
@@ -138,10 +156,16 @@ public class ChessGame {
             ChessPiece king = chessBoard.getPiece(kingPosition);
             Collection<ChessMove> kingMoves = king.pieceMoves(chessBoard, kingPosition);
             // get offending pieces
+            Collection<ChessMove> offendingMoves = getOffendingPieces(teamColor);
 
-            if (kingMoves.isEmpty()){
-                if ()
-            }
+//            for (ChessPiece piece : offendingMoves) {
+//                piece.pieceMoves(chessBoard, );
+//            }
+
+
+//            if (kingMoves.isEmpty()){
+//                if ()
+//            }
             return false;
         }
         // if the king is in danger, no move a piece could make to get the king out
@@ -155,18 +179,18 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        for (int i = 0; i < 9; i++){
-            for (int j = 0; j < 9; j++){
+        if (isInCheck(teamColor)) {
+            return false;
+        }
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
                 ChessPosition currentPosition = new ChessPosition(i,j);
                 ChessPiece currentPiece = chessBoard.getPiece(currentPosition);
-                if (currentPiece.getTeamColor() == teamColor){
-                    if (currentPiece.getPieceType() == ChessPiece.PieceType.KING){
-                        if (isInCheck(teamColor)){
+                if (currentPiece != null) {
+                    if (currentPiece.getTeamColor().equals(teamColor)){
+                        if (!currentPiece.pieceMoves(chessBoard, currentPosition).isEmpty()) {
                             return false;
                         }
-                    }
-                    if (!currentPiece.pieceMoves(chessBoard, currentPosition).isEmpty()) {
-                        return false;
                     }
                 }
             }
