@@ -13,7 +13,7 @@ import java.util.Objects;
  */
 public class ChessGame {
     private ChessBoard chessBoard = new ChessBoard();
-    private boolean whiteTeamTurn = true;
+    private ChessGame.TeamColor teamTurn = ChessGame.TeamColor.WHITE;
     public ChessGame() {
         chessBoard.resetBoard();
     }
@@ -22,13 +22,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        if (whiteTeamTurn){
-            whiteTeamTurn = false;
-            return TeamColor.WHITE;
-        } else {
-            whiteTeamTurn = true;
-            return TeamColor.BLACK;
-        }
+        return teamTurn;
     }
 
     /**
@@ -37,11 +31,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        if (team == TeamColor.WHITE){
-            whiteTeamTurn = true;
-        } else {
-            whiteTeamTurn = false;
-        }
+        teamTurn = team;
     }
 
     /**
@@ -90,11 +80,10 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition startPos = move.getStartPosition();
         ChessPosition endPos = move.getEndPosition();
+        ChessPiece piece = chessBoard.getPiece(startPos);
         Collection<ChessMove> validMoves = validMoves(startPos);
-        TeamColor currentTeam = getTeamTurn();
-        if ((currentTeam == TeamColor.BLACK && !whiteTeamTurn) || (currentTeam == TeamColor.WHITE && whiteTeamTurn)) {
+        if (piece != null && teamTurn == piece.getTeamColor()) {
             if (validMoves != null && !validMoves.isEmpty() && validMoves.contains(move)) {
-                ChessPiece piece = chessBoard.getPiece(move.getStartPosition());
                 ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
                 if (promotionPiece == null) {
                     promotionPiece = piece.getPieceType();
@@ -114,12 +103,10 @@ public class ChessGame {
         } else {
             throw new InvalidMoveException();
         }
-        if (whiteTeamTurn) {
+        if (teamTurn == TeamColor.WHITE) {
             setTeamTurn(TeamColor.BLACK);
-            whiteTeamTurn = false;
         } else {
             setTeamTurn(TeamColor.WHITE);
-            whiteTeamTurn = true;
         }
     }
 
