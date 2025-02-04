@@ -2,12 +2,15 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import chess.ChessGame.TeamColor;
+
 
 public class QueenCalculator implements PieceMovesCalculator {
+    Collection<ChessMove> moves = new ArrayList<>();
     public QueenCalculator(){
     }
 
-    public boolean moveHelper(ChessPosition endPos, ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+    public boolean moveHelper(ChessPosition endPos, TeamColor teamColor, ChessBoard board, ChessPosition myPosition){
         ChessPiece curPiece = board.getPiece(endPos);
         if (curPiece != null) {
             if (curPiece.getTeamColor().equals(teamColor)) {
@@ -24,50 +27,50 @@ public class QueenCalculator implements PieceMovesCalculator {
         return false;
     }
 
-    public void forwardMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves) {
+    public void forwardMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol) {
         for (int i = myRow + 1; i < 9; i++) {
             ChessPosition endPos = new ChessPosition(i, myCol);
-            if (moveHelper(endPos, teamColor, board, myPosition, myRow, myCol, moves)) {
+            if (moveHelper(endPos, teamColor, board, myPosition)) {
                 break;
             }
         }
     }
 
 
-    public void backwardMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+    public void backwardMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol){
         for (int i = myRow-1; i >= 1 ; i--){
             ChessPosition endPos = new ChessPosition(i, myCol);
-            if (moveHelper(endPos, teamColor, board, myPosition, myRow, myCol, moves)){
+            if (moveHelper(endPos, teamColor, board, myPosition)){
                 break;
             }
         }
     }
 
 
-    public void rightMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+    public void rtMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol){
         for (int i = myCol+1; i < 9; i++){
             ChessPosition endPos = new ChessPosition(myRow, i);
-            if (moveHelper(endPos, teamColor, board, myPosition, myRow, myCol, moves)){
+            if (moveHelper(endPos, teamColor, board, myPosition)){
                 break;
             }
         }
     }
 
-    public void leftMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+    public void ltMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol){
         for (int i = myCol-1; i >= 1; i--){
             ChessPosition endPos = new ChessPosition(myRow, i);
-            if (moveHelper(endPos, teamColor, board, myPosition, myRow, myCol, moves)){
+            if (moveHelper(endPos, teamColor, board, myPosition)){
                 break;
             }
         }
     }
 
-    public void forwardRightMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+    public void forwardRtMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol){
         int tempCol = myCol+1;
         int tempRow = myRow+1;
         while ((tempCol < 9) && (tempRow < 9)) {
             ChessPosition endPos = new ChessPosition(tempRow, tempCol);
-            if (moveHelper(endPos, teamColor, board, myPosition, myRow, myCol, moves)){
+            if (moveHelper(endPos, teamColor, board, myPosition)){
                 break;
             }
             tempCol++;
@@ -75,12 +78,12 @@ public class QueenCalculator implements PieceMovesCalculator {
         }
     }
 
-    public void forwardLeftMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves) {
+    public void forwardLtMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol) {
         int tempCol = myCol - 1;
         int tempRow = myRow + 1;
         while ((tempCol >= 1) && (tempRow < 9)) {
             ChessPosition endPos = new ChessPosition(tempRow, tempCol);
-            if (moveHelper(endPos, teamColor, board, myPosition, myRow, myCol, moves)){
+            if (moveHelper(endPos, teamColor, board, myPosition)){
                 break;
             }
             tempCol--;
@@ -89,12 +92,12 @@ public class QueenCalculator implements PieceMovesCalculator {
     }
 
 
-    public void backLeftMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+    public void backLtMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol){
         int tempCol = myCol-1;
         int tempRow = myRow-1;
         while ((tempCol >= 1) && (tempRow >= 1)) {
             ChessPosition endPos = new ChessPosition(tempRow, tempCol);
-            if (moveHelper(endPos, teamColor, board, myPosition, myRow, myCol, moves)){
+            if (moveHelper(endPos, teamColor, board, myPosition)){
                 break;
             }
             tempCol--;
@@ -103,12 +106,12 @@ public class QueenCalculator implements PieceMovesCalculator {
     }
 
 
-    public void backRightMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+    public void backRtMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol){
         int tempCol = myCol+1;
         int tempRow = myRow-1;
         while ((tempCol < 9) && (tempRow >= 1)) {
             ChessPosition endPos = new ChessPosition(tempRow, tempCol);
-            if (moveHelper(endPos, teamColor, board, myPosition, myRow, myCol, moves)){
+            if (moveHelper(endPos, teamColor, board, myPosition)){
                 break;
             }
             tempCol++;
@@ -118,17 +121,16 @@ public class QueenCalculator implements PieceMovesCalculator {
 
     @Override
     public Collection<ChessMove> getMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<>();
         int myCol = myPosition.getColumn();
         int myRow = myPosition.getRow();
-        forwardMoves(teamColor, board, myPosition, myRow, myCol, moves);
-        backwardMoves(teamColor, board, myPosition, myRow, myCol, moves);
-        rightMoves(teamColor, board, myPosition, myRow, myCol, moves);
-        leftMoves(teamColor, board, myPosition, myRow, myCol, moves);
-        forwardLeftMoves(teamColor, board, myPosition, myRow, myCol, moves);
-        forwardRightMoves(teamColor, board, myPosition, myRow, myCol, moves);
-        backLeftMoves(teamColor, board, myPosition, myRow, myCol, moves);
-        backRightMoves(teamColor, board, myPosition, myRow, myCol, moves);
+        forwardMoves(teamColor, board, myPosition, myRow, myCol);
+        backwardMoves(teamColor, board, myPosition, myRow, myCol);
+        rtMoves(teamColor, board, myPosition, myRow, myCol);
+        ltMoves(teamColor, board, myPosition, myRow, myCol);
+        forwardLtMoves(teamColor, board, myPosition, myRow, myCol);
+        forwardRtMoves(teamColor, board, myPosition, myRow, myCol);
+        backLtMoves(teamColor, board, myPosition, myRow, myCol);
+        backRtMoves(teamColor, board, myPosition, myRow, myCol);
         return moves;
     }
 
