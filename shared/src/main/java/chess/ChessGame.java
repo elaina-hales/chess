@@ -190,25 +190,19 @@ public class ChessGame {
         if (!isInCheck(teamColor)) {
             return false;
         } else {
-            // king is in danger and no valid moves
-            ChessPosition kingPosition = getKingPosition(teamColor);
-            ChessPiece king = chessBoard.getPiece(kingPosition);
-            Collection<ChessMove> kingMoves = king.pieceMoves(chessBoard, kingPosition);
-            if (revisedKingMoves(teamColor, kingMoves, king, kingPosition).isEmpty()) {
-                for (int i = 1; i < 9; i++) {
-                    for (int j = 1; j < 9; j++) {
-                        ChessPosition currentPosition = new ChessPosition(i, j);
-                        ChessPiece piece = chessBoard.getPiece(currentPosition);
-                        if (piece != null && piece.getTeamColor() == teamColor) {
-                            if (!validMoves(currentPosition).isEmpty()) {
-                                return false;
-                            }
+            for (int i = 1; i < 9; i++) {
+                for (int j = 1; j < 9; j++) {
+                    ChessPosition currentPosition = new ChessPosition(i, j);
+                    ChessPiece piece = chessBoard.getPiece(currentPosition);
+                    if (piece != null && piece.getTeamColor() == teamColor) {
+                        if (!validMoves(currentPosition).isEmpty()) {
+                            return false;
                         }
                     }
                 }
             }
+            return true;
         }
-        return true;
     }
 
     /**
@@ -259,18 +253,6 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return chessBoard;
-    }
-
-    public ChessBoard copy() {
-        ChessBoard temp = new ChessBoard();
-        for (int i = 1; i < 9; i++){
-            for (int j = 1; j < 9; j++){
-                ChessPosition currentPosition = new ChessPosition(i, j);
-                ChessPiece currentPiece = chessBoard.getPiece(currentPosition);
-                temp.addPiece(currentPosition, currentPiece);
-            }
-        }
-        return temp;
     }
 
     @Override
