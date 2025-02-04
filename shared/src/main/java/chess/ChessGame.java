@@ -54,18 +54,18 @@ public class ChessGame {
         if (piece != null){
             Collection<ChessMove> moves = piece.pieceMoves(chessBoard, startPosition);
             TeamColor color = piece.getTeamColor();
-            Collection<ChessMove> tmp_moves = piece.pieceMoves(chessBoard, startPosition);
+            Collection<ChessMove> tmpMoves = piece.pieceMoves(chessBoard, startPosition);
             for (ChessMove move : moves){
-                ChessPiece original_piece = chessBoard.getPiece(move.getEndPosition());
+                ChessPiece originalPiece = chessBoard.getPiece(move.getEndPosition());
                 chessBoard.addPiece(move.getEndPosition(), piece);
                 chessBoard.addPiece(move.getStartPosition(), null);
                 if (isInCheck(color)) {
-                    tmp_moves.remove(move);
+                    tmpMoves.remove(move);
                 }
                 chessBoard.addPiece(move.getStartPosition(), piece);
-                chessBoard.addPiece(move.getEndPosition(), original_piece);
+                chessBoard.addPiece(move.getEndPosition(), originalPiece);
             }
-            moves = tmp_moves;
+            moves = tmpMoves;
             return moves;
         }
         return null;
@@ -246,7 +246,6 @@ public class ChessGame {
         chessBoard = board;
     }
 
-
     /**
      * Gets the current chessboard
      *
@@ -255,7 +254,6 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return chessBoard;
     }
-
 
     @Override
     public boolean equals(Object o) {

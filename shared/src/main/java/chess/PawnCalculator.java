@@ -18,14 +18,14 @@ public class PawnCalculator implements PieceMovesCalculator {
 
 
     public Collection<ChessMove> promote(ChessGame.TeamColor teamColor, ChessPosition myPosition, ChessPosition endPos, int myRow, Collection<ChessMove> moves){
-        ChessMove q_promotion = new ChessMove(myPosition, endPos, ChessPiece.PieceType.QUEEN);
-        ChessMove r_promotion = new ChessMove(myPosition, endPos, ChessPiece.PieceType.ROOK);
-        ChessMove k_promotion = new ChessMove(myPosition, endPos, ChessPiece.PieceType.KNIGHT);
-        ChessMove b_promotion = new ChessMove(myPosition, endPos, ChessPiece.PieceType.BISHOP);
-        moves.add(q_promotion);
-        moves.add(r_promotion);
-        moves.add(k_promotion);
-        moves.add(b_promotion);
+        ChessMove qPromotion = new ChessMove(myPosition, endPos, ChessPiece.PieceType.QUEEN);
+        ChessMove rPromotion = new ChessMove(myPosition, endPos, ChessPiece.PieceType.ROOK);
+        ChessMove kPromotion = new ChessMove(myPosition, endPos, ChessPiece.PieceType.KNIGHT);
+        ChessMove bPromotion = new ChessMove(myPosition, endPos, ChessPiece.PieceType.BISHOP);
+        moves.add(qPromotion);
+        moves.add(rPromotion);
+        moves.add(kPromotion);
+        moves.add(bPromotion);
         return moves;
     }
 
