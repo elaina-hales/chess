@@ -13,7 +13,10 @@ public class PawnCalculator implements PieceMovesCalculator {
     public boolean canPromote(TeamColor teamColor, int myRow) {
         if ((myRow == 8) && teamColor.equals(TeamColor.WHITE)) {
             return true;
-        } else return (myRow == 1) && teamColor.equals(TeamColor.BLACK);
+        } else if ((myRow == 1) && teamColor.equals(TeamColor.BLACK)){
+            return true;
+        }
+        return false;
     }
 
 
