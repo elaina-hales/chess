@@ -2,22 +2,22 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import chess.ChessGame.TeamColor;
+
 
 public class PawnCalculator implements PieceMovesCalculator {
+    private final Collection<ChessMove> moves = new ArrayList<>();
     public PawnCalculator(){
     }
 
-    boolean canPromote(ChessGame.TeamColor teamColor, int myRow) {
-        if ((myRow == 8) && teamColor.equals(ChessGame.TeamColor.WHITE)) {
+    public boolean canPromote(TeamColor teamColor, int myRow) {
+        if ((myRow == 8) && teamColor.equals(TeamColor.WHITE)) {
             return true;
-        } else if ((myRow == 1) && teamColor.equals(ChessGame.TeamColor.BLACK)) {
-            return true;
-        }
-        return false;
+        } else return (myRow == 1) && teamColor.equals(TeamColor.BLACK);
     }
 
 
-    public Collection<ChessMove> promote(ChessGame.TeamColor teamColor, ChessPosition myPosition, ChessPosition endPos, int myRow, Collection<ChessMove> moves){
+    public void promote(ChessPosition myPosition, ChessPosition endPos){
         ChessMove qPromotion = new ChessMove(myPosition, endPos, ChessPiece.PieceType.QUEEN);
         ChessMove rPromotion = new ChessMove(myPosition, endPos, ChessPiece.PieceType.ROOK);
         ChessMove kPromotion = new ChessMove(myPosition, endPos, ChessPiece.PieceType.KNIGHT);
@@ -26,70 +26,60 @@ public class PawnCalculator implements PieceMovesCalculator {
         moves.add(rPromotion);
         moves.add(kPromotion);
         moves.add(bPromotion);
-        return moves;
     }
 
-    public Collection<ChessMove> moveForwardOne(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+    public void moveForwardOne(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol) {
         if ((myRow >= 1) && (myRow < 9)) {
             ChessPosition endPos = new ChessPosition(myRow, myCol);
             ChessPiece curPiece = board.getPiece(endPos);
             if (curPiece == null) {
                 if (canPromote(teamColor, myRow)) {
-                    moves = promote(teamColor, myPosition, endPos, myRow, moves);
+                    promote(myPosition, endPos);
                 } else {
                     ChessMove cur = new ChessMove(myPosition, endPos, null);
                     moves.add(cur);
                 }
             }
         }
-        return moves;
     }
 
-    public Collection<ChessMove> capture(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+    public void capture(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol) {
         int right = myCol+1;
         int left = myCol-1;
         if ((myRow >= 1) && (myRow < 9)) {
-            if ((left >= 1)) {
+            if (left >= 1){
                 ChessPosition leftPos = new ChessPosition(myRow, left);
                 ChessPiece leftPiece = board.getPiece(leftPos);
-                if (leftPiece != null) {
-                    if (!leftPiece.getTeamColor().equals(teamColor)) {
-                        if (canPromote(teamColor, myRow)) {
-                            promote(teamColor, myPosition, leftPos, myRow, moves);
-                        } else {
-                            ChessMove cur = new ChessMove(myPosition, leftPos, null);
-                            moves.add(cur);
-                        }
+                if (leftPiece != null && !leftPiece.getTeamColor().equals(teamColor)) {
+                    if (canPromote(teamColor, myRow)) {
+                        promote(myPosition, leftPos);
+                    } else {
+                        ChessMove cur = new ChessMove(myPosition, leftPos, null);
+                        moves.add(cur);
                     }
                 }
-
             }
             if (right <= 8){
                 ChessPosition rightPos = new ChessPosition(myRow, right);
                 ChessPiece rightPiece = board.getPiece(rightPos);
-                if (rightPiece != null) {
-                    if (!rightPiece.getTeamColor().equals(teamColor)) {
-                        if (canPromote(teamColor, myRow)) {
-                            promote(teamColor, myPosition, rightPos, myRow, moves);
-                        } else {
-                            ChessMove cur = new ChessMove(myPosition, rightPos, null);
-                            moves.add(cur);
-                        }
+                if (rightPiece != null && !rightPiece.getTeamColor().equals(teamColor)) {
+                    if (canPromote(teamColor, myRow)) {
+                        promote(myPosition, rightPos);
+                    } else {
+                        ChessMove cur = new ChessMove(myPosition, rightPos, null);
+                        moves.add(cur);
                     }
                 }
             }
         }
-        return moves;
     }
 
 
     @Override
-    public Collection<ChessMove> getMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<>();
+    public Collection<ChessMove> getMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition) {
         int myCol = myPosition.getColumn();
         int myRow = myPosition.getRow();
-        // forwards and backwards are different for different color pawns
-        if (teamColor == ChessGame.TeamColor.WHITE){
+        if (teamColor == TeamColor.WHITE){
             if (myRow == 2){
                 ChessPosition curPos1 = new ChessPosition(myRow+2, myCol);
                 ChessPosition curPos2 = new ChessPosition(myRow+1, myCol);
@@ -98,9 +88,9 @@ public class PawnCalculator implements PieceMovesCalculator {
                     moves.add(cur);
                 }
             }
-            moves = moveForwardOne(teamColor, board, myPosition, myRow+1, myCol, moves);
-            moves = capture(teamColor, board, myPosition, myRow+1, myCol, moves);
-        } else if (teamColor == ChessGame.TeamColor.BLACK){
+            moveForwardOne(teamColor, board, myPosition, myRow+1, myCol);
+            capture(teamColor, board, myPosition, myRow+1, myCol);
+        } else if (teamColor == TeamColor.BLACK){
             if (myRow == 7){
                 ChessPosition curPos1 = new ChessPosition(myRow-2, myCol);
                 ChessPosition curPos2 = new ChessPosition(myRow-1, myCol);
@@ -109,8 +99,8 @@ public class PawnCalculator implements PieceMovesCalculator {
                     moves.add(cur);
                 }
             }
-            moves = moveForwardOne(teamColor, board, myPosition, myRow-1, myCol, moves);
-            moves = capture(teamColor, board, myPosition, myRow-1, myCol, moves);
+            moveForwardOne(teamColor, board, myPosition, myRow-1, myCol);
+            capture(teamColor, board, myPosition, myRow-1, myCol);
         }
         return moves;
     }

@@ -17,3 +17,11 @@
 - valid moves -- delegate to chess piece classes
 - remove movements that thought could make but may be check moves
 - Stalemate: no possible moves that would not put my king in check
+
+### Phase 2:
+- create sequence diagrams to represent your understanding of the phase 3 spec
+- can receive 0, 50, 100 on it. You have one week after that to do what they said and resubmit if you do bad
+- requests come in and hit the server as handlers, which you write
+- those can be plugged into your server, and they create an instance of a service class which you create
+- should be able to clear database, register, login
+- gson needs a class that matches gson string

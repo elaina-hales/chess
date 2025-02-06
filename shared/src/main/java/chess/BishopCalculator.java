@@ -2,12 +2,15 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import chess.ChessGame.TeamColor;
+
 
 public class BishopCalculator implements PieceMovesCalculator {
+    private final Collection<ChessMove> moves = new ArrayList<>();
     public BishopCalculator(){
     }
 
-    public boolean moveHelper(ChessPosition endPos, ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+    public boolean moveHelper(ChessPosition endPos, TeamColor teamColor, ChessBoard board, ChessPosition myPosition){
         ChessPiece curPiece = board.getPiece(endPos);
         if (curPiece != null) {
             if (curPiece.getTeamColor().equals(teamColor)) {
@@ -24,12 +27,12 @@ public class BishopCalculator implements PieceMovesCalculator {
         return false;
     }
 
-    public void forwardRightMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+    public void forwardRtMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol){
         int tempCol = myCol+1;
         int tempRow = myRow+1;
         while ((tempCol < 9) && (tempRow < 9)) {
             ChessPosition endPos = new ChessPosition(tempRow, tempCol);
-            if (moveHelper(endPos, teamColor, board, myPosition, myRow, myCol, moves)){
+            if (moveHelper(endPos, teamColor, board, myPosition)){
                 break;
             }
             tempCol++;
@@ -37,12 +40,12 @@ public class BishopCalculator implements PieceMovesCalculator {
         }
     }
 
-    public void forwardLeftMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves) {
+    public void forwardLtMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol) {
         int tempCol = myCol - 1;
         int tempRow = myRow + 1;
         while ((tempCol >= 1) && (tempRow < 9)) {
             ChessPosition endPos = new ChessPosition(tempRow, tempCol);
-            if (moveHelper(endPos, teamColor, board, myPosition, myRow, myCol, moves)){
+            if (moveHelper(endPos, teamColor, board, myPosition)){
                 break;
             }
             tempCol--;
@@ -51,12 +54,12 @@ public class BishopCalculator implements PieceMovesCalculator {
     }
 
 
-    public void backLeftMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+    public void backLtMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol){
         int tempCol = myCol-1;
         int tempRow = myRow-1;
         while ((tempCol >= 1) && (tempRow >= 1)) {
             ChessPosition endPos = new ChessPosition(tempRow, tempCol);
-            if (moveHelper(endPos, teamColor, board, myPosition, myRow, myCol, moves)){
+            if (moveHelper(endPos, teamColor, board, myPosition)){
                 break;
             }
             tempCol--;
@@ -65,12 +68,12 @@ public class BishopCalculator implements PieceMovesCalculator {
     }
 
 
-    public void backRightMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol, Collection<ChessMove> moves){
+    public void backRtMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int myCol){
         int tempCol = myCol+1;
         int tempRow = myRow-1;
         while ((tempCol < 9) && (tempRow >= 1)) {
             ChessPosition endPos = new ChessPosition(tempRow, tempCol);
-            if (moveHelper(endPos, teamColor, board, myPosition, myRow, myCol, moves)){
+            if (moveHelper(endPos, teamColor, board, myPosition)){
                 break;
             }
             tempCol++;
@@ -79,15 +82,13 @@ public class BishopCalculator implements PieceMovesCalculator {
     }
 
    @Override
-    public Collection<ChessMove> getMoves(ChessGame.TeamColor teamColor, ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<>();
+    public Collection<ChessMove> getMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition) {
         int myCol = myPosition.getColumn();
         int myRow = myPosition.getRow();
-        forwardRightMoves(teamColor, board, myPosition, myRow, myCol, moves);
-        forwardLeftMoves(teamColor, board, myPosition, myRow, myCol, moves);
-        backLeftMoves(teamColor, board, myPosition, myRow, myCol, moves);
-        backRightMoves(teamColor, board, myPosition, myRow, myCol, moves);
+        forwardRtMoves(teamColor, board, myPosition, myRow, myCol);
+        forwardLtMoves(teamColor, board, myPosition, myRow, myCol);
+        backLtMoves(teamColor, board, myPosition, myRow, myCol);
+        backRtMoves(teamColor, board, myPosition, myRow, myCol);
         return moves;
     }
-
 }
