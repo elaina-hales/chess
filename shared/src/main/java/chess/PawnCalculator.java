@@ -51,28 +51,23 @@ public class PawnCalculator implements PieceMovesCalculator {
         int left = myCol-1;
         if ((myRow >= 1) && (myRow < 9)) {
             if (left >= 1){
-                ChessPosition leftPos = new ChessPosition(myRow, left);
-                ChessPiece leftPiece = board.getPiece(leftPos);
-                if (leftPiece != null && !leftPiece.getTeamColor().equals(teamColor)) {
-                    if (canPromote(teamColor, myRow)) {
-                        promote(myPosition, leftPos);
-                    } else {
-                        ChessMove cur = new ChessMove(myPosition, leftPos, null);
-                        moves.add(cur);
-                    }
-                }
+                addCaptureMoves(teamColor, board, myPosition, myRow, left);
             }
             if (right <= 8){
-                ChessPosition rightPos = new ChessPosition(myRow, right);
-                ChessPiece rightPiece = board.getPiece(rightPos);
-                if (rightPiece != null && !rightPiece.getTeamColor().equals(teamColor)) {
-                    if (canPromote(teamColor, myRow)) {
-                        promote(myPosition, rightPos);
-                    } else {
-                        ChessMove cur = new ChessMove(myPosition, rightPos, null);
-                        moves.add(cur);
-                    }
-                }
+                addCaptureMoves(teamColor, board, myPosition, myRow, right);
+            }
+        }
+    }
+
+    private void addCaptureMoves(TeamColor teamColor, ChessBoard board, ChessPosition myPosition, int myRow, int side) {
+        ChessPosition rightPos = new ChessPosition(myRow, side);
+        ChessPiece rightPiece = board.getPiece(rightPos);
+        if (rightPiece != null && !rightPiece.getTeamColor().equals(teamColor)) {
+            if (canPromote(teamColor, myRow)) {
+                promote(myPosition, rightPos);
+            } else {
+                ChessMove cur = new ChessMove(myPosition, rightPos, null);
+                moves.add(cur);
             }
         }
     }
