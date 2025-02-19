@@ -9,7 +9,7 @@ import service.*;
 
 
 public class RegisterHandler {
-    public static String handleRequest(Request req, Response res) {
+    public String handleRequest(Request req, Response res) {
         Gson gson = new Gson();
         try {
             RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);

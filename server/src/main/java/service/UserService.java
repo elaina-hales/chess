@@ -4,6 +4,7 @@ import requestsresults.*;
 import dataaccess.*;
 
 public class UserService {
+
     public RegisterResult register(RegisterRequest registerRequest) throws AlreadyTakenException, BadRequestExeception {
         MemoryUser user = new MemoryUser();
         MemoryAuth userAuth = new MemoryAuth();

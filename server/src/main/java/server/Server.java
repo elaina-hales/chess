@@ -1,6 +1,5 @@
 package server;
 import handlers.RegisterHandler;
-
 import spark.*;
 
 public class Server {
@@ -25,6 +24,7 @@ public class Server {
     }
 
     private static void createRoutes() {
+
         Spark.post("/user", (req, res) -> (new RegisterHandler()).handleRequest(req, res));
 //        Spark.post("/session", (req, res) -> );
 //        Spark.delete("/session", (req, res) -> );
