@@ -5,9 +5,7 @@ import dataaccess.*;
 
 public class UserService {
 
-    public RegisterResult register(RegisterRequest registerRequest) throws AlreadyTakenException, BadRequestExeception {
-        MemoryUser user = new MemoryUser();
-        MemoryAuth userAuth = new MemoryAuth();
+    public RegisterResult register(RegisterRequest registerRequest, UserDAO user, AuthDAO userAuth) throws AlreadyTakenException, BadRequestException {
         UserData userResult = user.getUser(registerRequest.username());
         if (userResult == null){
             if (registerRequest.username() != null && registerRequest.password() != null && registerRequest.email() != null){
@@ -16,12 +14,23 @@ public class UserService {
                 String authToken = userAuth.createAuth(registerRequest.username());
                 return new RegisterResult(registerRequest.username(), authToken);
             } else {
-                throw new BadRequestExeception();
+                throw new BadRequestException("Error: bad request");
             }
         } else {
-            throw new AlreadyTakenException();
+            throw new AlreadyTakenException("Error: already taken");
         }
     }
-//    public LoginResult login(LoginRequest loginRequest) {}
+    public LoginResult login(LoginRequest loginRequest, UserDAO user, AuthDAO userAuth) throws UnauthorizedException {
+        String username = loginRequest.username();
+        String password = loginRequest.password();
+        UserData userResult = user.getUser(loginRequest.username());
+        if (userResult != null){
+            if (username != null && password != null && user.passMatch(username, password)){
+                String authToken = userAuth.createAuth(username);
+                return new LoginResult(username, authToken);
+            }
+        }
+        throw new UnauthorizedException("Error: unauthorized");
+    }
 //    public void logout(LogoutRequest logoutRequest) {}
 }

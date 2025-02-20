@@ -1,6 +1,7 @@
 package dataaccess;
 import model.UserData;
 import java.util.HashMap;
+import java.util.Objects;
 
 
 public class MemoryUser implements UserDAO{
@@ -16,5 +17,12 @@ public class MemoryUser implements UserDAO{
     public UserData getUser(String username) {
         return users.get(username);
     }
+
+    @Override
+    public Boolean passMatch(String username, String password) {
+        UserData user = getUser(username);
+        return Objects.equals(user.password(), password);
+    }
+
 
 }

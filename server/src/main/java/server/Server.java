@@ -1,4 +1,9 @@
 package server;
+import dataaccess.AuthDAO;
+import dataaccess.MemoryAuth;
+import dataaccess.MemoryUser;
+import dataaccess.UserDAO;
+import handlers.LoginHandler;
 import handlers.RegisterHandler;
 import spark.*;
 
@@ -24,9 +29,10 @@ public class Server {
     }
 
     private static void createRoutes() {
-
-        Spark.post("/user", (req, res) -> (new RegisterHandler()).handleRequest(req, res));
-//        Spark.post("/session", (req, res) -> );
+        UserDAO user = new MemoryUser();
+        AuthDAO userAuth = new MemoryAuth();
+        Spark.post("/user", (req, res) -> (new RegisterHandler()).handleRequest(req, res, user, userAuth));
+        Spark.post("/session", (req, res) -> (new LoginHandler()).handleRequest(req, res, user, userAuth) );
 //        Spark.delete("/session", (req, res) -> );
 //        Spark.get("/game", (req, res) -> handler);
 //        Spark.post("/game", (req, res) -> handler);
