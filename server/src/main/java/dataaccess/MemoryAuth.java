@@ -13,12 +13,17 @@ public class MemoryAuth implements AuthDAO{
     @Override
     public String createAuth(String username) {
         String authToken = generateToken();
-        usersAuth.put(generateToken(), username);
+        usersAuth.put(authToken, username);
         return authToken;
     }
 
     @Override
     public String getAuth(String authToken) {
         return usersAuth.get(authToken);
+    }
+
+    @Override
+    public void deleteAuth(String authToken) {
+        usersAuth.remove(authToken);
     }
 }

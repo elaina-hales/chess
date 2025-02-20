@@ -32,5 +32,15 @@ public class UserService {
         }
         throw new UnauthorizedException("Error: unauthorized");
     }
-//    public void logout(LogoutRequest logoutRequest) {}
+
+    public LogoutResult logout(LogoutRequest logoutRequest, AuthDAO userAuth) throws UnauthorizedException {
+        String authToken = logoutRequest.authToken();
+        String username = userAuth.getAuth(authToken);
+        if (username == null){
+            throw new UnauthorizedException("Error: unauthorized");
+        } else {
+            userAuth.deleteAuth(authToken);
+            return new LogoutResult();
+        }
+    }
 }
