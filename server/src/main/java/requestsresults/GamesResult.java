@@ -1,9 +1,9 @@
 package requestsresults;
 
-import chess.ChessGame;
+import model.GameData;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 public record GamesResult(
-        ArrayList<ChessGame> authToken){
+        Collection<GameData> games){
 }
