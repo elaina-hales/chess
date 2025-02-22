@@ -16,7 +16,7 @@ public class RegisterHandler {
             UserService service = new UserService();
             RegisterResult result = service.register(request, user, userAuth);
             return gson.toJson(result);
-        } catch (BadRequestException b) {
+        } catch (BadReqException b) {
             res.status(400);
             Error err = new Error(b.getMessage());
             return gson.toJson(err);

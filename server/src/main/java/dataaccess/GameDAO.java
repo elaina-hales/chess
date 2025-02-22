@@ -1,7 +1,8 @@
 package dataaccess;
-import model.*;
+
+import model.GameData;
 import service.AlreadyTakenException;
-import service.BadRequestException;
+import service.BadReqException;
 
 import java.util.Collection;
 
@@ -9,6 +10,6 @@ public interface GameDAO {
      Collection<GameData> listGames();
      GameData getGame(int gameID);
      int createGame(String gameName);
-     void updateGame(int gameID, String playerColor, String username) throws AlreadyTakenException, BadRequestException;
+     void updateGame(int gameID, String playerColor, String username) throws AlreadyTakenException, BadReqException;
      void clear();
 }

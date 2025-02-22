@@ -19,7 +19,7 @@ public class GamesService {
         }
     }
 
-    public JoinResult join(JoinRequest request, String authToken, AuthDAO userAuth, GameDAO games) throws UnauthorizedException, BadRequestException, AlreadyTakenException {
+    public JoinResult join(JoinRequest request, String authToken, AuthDAO userAuth, GameDAO games) throws UnauthorizedException, BadReqException, AlreadyTakenException {
         String username = userAuth.getAuth(authToken);
         if (username == null){
             throw new UnauthorizedException("Error: unauthorized");
@@ -31,7 +31,7 @@ public class GamesService {
                 games.updateGame(gameID, playerColor, username);
                 return new JoinResult();
             } else {
-                throw new BadRequestException("Error: bad request");
+                throw new BadReqException("Error: bad request");
             }
         }
     }

@@ -4,7 +4,7 @@ import requestsresults.*;
 import dataaccess.*;
 
 public class UserService {
-    public RegisterResult register(RegisterRequest registerRequest, UserDAO user, AuthDAO userAuth) throws AlreadyTakenException, BadRequestException {
+    public RegisterResult register(RegisterRequest registerRequest, UserDAO user, AuthDAO userAuth) throws AlreadyTakenException, BadReqException {
         UserData userResult = user.getUser(registerRequest.username());
         if (userResult == null){
             if (registerRequest.username() != null && registerRequest.password() != null && registerRequest.email() != null){
@@ -13,7 +13,7 @@ public class UserService {
                 String authToken = userAuth.createAuth(registerRequest.username());
                 return new RegisterResult(registerRequest.username(), authToken);
             } else {
-                throw new BadRequestException("Error: bad request");
+                throw new BadReqException("Error: bad request");
             }
         } else {
             throw new AlreadyTakenException("Error: already taken");
@@ -25,7 +25,7 @@ public class UserService {
         String password = loginRequest.password();
         UserData userResult = user.getUser(loginRequest.username());
         if (userResult != null){
-            if (username != null && password != null && user.passMatch(username, password)){
+            if (username != null && password != null && user.isPassMatch(username, password)){
                 String authToken = userAuth.createAuth(username);
                 return new LoginResult(username, authToken);
             }

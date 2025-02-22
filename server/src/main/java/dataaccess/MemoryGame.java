@@ -3,9 +3,10 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 import service.AlreadyTakenException;
-import service.BadRequestException;
+import service.BadReqException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 public class MemoryGame implements GameDAO{
@@ -36,26 +37,30 @@ public class MemoryGame implements GameDAO{
     }
 
     @Override
-    public void updateGame(int gameID, String playerColor, String username) throws AlreadyTakenException, BadRequestException {
+    public void updateGame(int gameID, String color, String username) throws AlreadyTakenException, BadReqException {
         GameData game = getGame(gameID);
-        if (playerColor.equals("Black") || playerColor.equals("black") || playerColor.equals("BLACK")) {
+        if (color.equals("BLACK")) {
             if (game.blackUsername() == null) {
-                GameData updatedGame = new GameData(gameID, game.whiteUsername(), username, game.gameName(), game.game());
+                String wUser = game.whiteUsername();
+                String gameName = game.gameName();
+                GameData updatedGame = new GameData(gameID, wUser, username, gameName, game.game());
                 games.add(updatedGame);
                 games.remove(game);
             } else {
                 throw new AlreadyTakenException("Error: already taken");
             }
-        } else if (playerColor.equals("White") || playerColor.equals("white") || playerColor.equals("WHITE")) {
+        } else if (color.equals("WHITE")) {
             if (game.whiteUsername() == null) {
-                GameData updatedGame = new GameData(gameID, username, game.blackUsername(), game.gameName(), game.game());
+                String bUser = game.blackUsername();
+                String gameName = game.gameName();
+                GameData updatedGame = new GameData(gameID, username, bUser, gameName, game.game());
                 games.add(updatedGame);
                 games.remove(game);
             } else {
                 throw new AlreadyTakenException("Error: already taken");
             }
         } else {
-            throw new BadRequestException("Error: bad request");
+            throw new BadReqException("Error: bad request");
         }
     }
 

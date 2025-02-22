@@ -16,7 +16,7 @@ public class CreateHandler {
             CreateRequest request = gson.fromJson(req.body(), CreateRequest.class);
             GamesService service = new GamesService();
             if (request.gameName() == null) {
-                throw new BadRequestException("Error: bad request");
+                throw new BadReqException("Error: bad request");
             } else {
                 CreateResult result = service.create(request, authToken, userAuth, games);
                 return gson.toJson(result);
@@ -25,7 +25,7 @@ public class CreateHandler {
             res.status(401);
             Error err = new Error(u.getMessage());
             return gson.toJson(err);
-        } catch (BadRequestException b) {
+        } catch (BadReqException b) {
             res.status(400);
             Error err = new Error(b.getMessage());
             return gson.toJson(err);

@@ -17,7 +17,7 @@ public class JoinHandler {
             JoinRequest request = gson.fromJson(req.body(), JoinRequest.class);
             GamesService service = new GamesService();
             if (request.playerColor() == null) {
-                throw new BadRequestException("Error: bad request");
+                throw new BadReqException("Error: bad request");
             } else {
                 JoinResult result = service.join(request, authToken, userAuth, games);
                 return gson.toJson(result);
@@ -26,7 +26,7 @@ public class JoinHandler {
             res.status(401);
             Error err = new Error(u.getMessage());
             return gson.toJson(err);
-        } catch (BadRequestException b) {
+        } catch (BadReqException b) {
             res.status(400);
             Error err = new Error(b.getMessage());
             return gson.toJson(err);

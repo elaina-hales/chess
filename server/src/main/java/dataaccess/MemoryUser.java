@@ -1,5 +1,7 @@
 package dataaccess;
+
 import model.UserData;
+
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -19,9 +21,9 @@ public class MemoryUser implements UserDAO{
     }
 
     @Override
-    public Boolean passMatch(String username, String password) {
+    public Boolean isPassMatch(String username, String password) {
         UserData user = getUser(username);
-        return Objects.equals(user.password(), password);
+        return user.password().equals(password);
     }
 
     @Override
