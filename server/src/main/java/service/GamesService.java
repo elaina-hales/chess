@@ -18,4 +18,22 @@ public class GamesService {
             return new GamesResult(listedGames);
         }
     }
+
+    public JoinResult join(JoinRequest request, String authToken, AuthDAO userAuth, GameDAO games) throws UnauthorizedException, BadRequestException, AlreadyTakenException {
+        String username = userAuth.getAuth(authToken);
+        if (username == null){
+            throw new UnauthorizedException("Error: unauthorized");
+        } else {
+            String playerColor = request.playerColor();
+            int gameID = request.GameID();
+            GameData game = games.getGame(gameID);
+            if (game != null) {
+                games.updateGame(gameID, playerColor, username);
+                return new JoinResult(playerColor, gameID);
+            } else {
+                throw new BadRequestException("Error: bad request");
+            }
+        }
+
+    }
 }

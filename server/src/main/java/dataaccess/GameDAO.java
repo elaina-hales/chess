@@ -1,11 +1,12 @@
 package dataaccess;
 import model.*;
+import service.AlreadyTakenException;
 
 import java.util.Collection;
 
 public interface GameDAO {
      Collection<GameData> listGames();
-     GameData getGame(String gameID);
+     GameData getGame(int gameID);
      GameData createGame(String gameName);
-     void updateGame(String gameID);
+     void updateGame(int gameID, String playerColor, String username) throws AlreadyTakenException;
 }

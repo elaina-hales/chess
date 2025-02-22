@@ -1,9 +1,6 @@
 package server;
 import dataaccess.*;
-import handlers.ListHandler;
-import handlers.LoginHandler;
-import handlers.LogoutHandler;
-import handlers.RegisterHandler;
+import handlers.*;
 import spark.*;
 
 public class Server {
@@ -36,7 +33,7 @@ public class Server {
         Spark.delete("/session", (req, res) -> (new LogoutHandler()).handleRequest(req, res, user, userAuth));
         Spark.get("/game", (req, res) -> (new ListHandler().handleRequest(req, res, userAuth, game)));
 //        Spark.post("/game", (req, res) -> handler);
-//        Spark.put("/game", (req, res) -> handler);
+        Spark.put("/game", (req, res) -> (new JoinHandler().handleRequest(req, res, userAuth, game)));
 //        Spark.delete("/db", (req, res) -> handler);
     }
 
