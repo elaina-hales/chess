@@ -1,14 +1,9 @@
 package handlers;
 
 import com.google.gson.Gson;
-import dataaccess.AuthDAO;
-import dataaccess.GameDAO;
-import requestsresults.JoinRequest;
-import requestsresults.JoinResult;
-import service.AlreadyTakenException;
-import service.BadRequestException;
-import service.GamesService;
-import service.UnauthorizedException;
+import dataaccess.*;
+import requestsresults.*;
+import service.*;
 import spark.Request;
 import spark.Response;
 
@@ -18,12 +13,12 @@ public class CreateHandler {
         Gson gson = new Gson();
         try {
             String authToken = req.headers("authorization");
-            JoinRequest request = gson.fromJson(req.body(), JoinRequest.class);
+            CreateRequest request = gson.fromJson(req.body(), CreateRequest.class);
             GamesService service = new GamesService();
-            if (request.GameID() <= 0 || request.playerColor() == null) {
+            if (request.gameName() == null) {
                 throw new BadRequestException("Error: bad request");
             } else {
-                JoinResult result = service.join(request, authToken, userAuth, games);
+                CreateResult result = service.create(request, authToken, userAuth, games);
                 return gson.toJson(result);
             }
         } catch (UnauthorizedException u) {
@@ -33,10 +28,6 @@ public class CreateHandler {
         } catch (BadRequestException b) {
             res.status(400);
             Error err = new Error(b.getMessage());
-            return gson.toJson(err);
-        } catch (AlreadyTakenException a) {
-            res.status(403);
-            Error err = new Error(a.getMessage());
             return gson.toJson(err);
         } catch (Exception e) {
             res.status(500);

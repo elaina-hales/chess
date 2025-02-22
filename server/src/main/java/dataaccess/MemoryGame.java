@@ -26,11 +26,12 @@ public class MemoryGame implements GameDAO{
     }
 
     @Override
-    public GameData createGame(String gameName) {
+    public int createGame(String gameName) {
         ChessGame game = new ChessGame();
+        int gameID = games.size()+1;
         GameData newGame = new GameData(games.size()+1, "", "", gameName, game);
         games.add(newGame);
-        return newGame;
+        return gameID;
     }
 
     @Override
@@ -45,5 +46,10 @@ public class MemoryGame implements GameDAO{
                 throw new AlreadyTakenException("Error: Already Taken");
             }
         }
+    }
+
+    @Override
+    public void clear(){
+        games.clear();
     }
 }

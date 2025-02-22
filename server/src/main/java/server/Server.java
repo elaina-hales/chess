@@ -32,9 +32,9 @@ public class Server {
         Spark.post("/session", (req, res) -> (new LoginHandler()).handleRequest(req, res, user, userAuth));
         Spark.delete("/session", (req, res) -> (new LogoutHandler()).handleRequest(req, res, user, userAuth));
         Spark.get("/game", (req, res) -> (new ListHandler().handleRequest(req, res, userAuth, game)));
-//        Spark.post("/game", (req, res) -> handler);
+        Spark.post("/game", (req, res) -> (new CreateHandler().handleRequest(req, res, userAuth, game)));
         Spark.put("/game", (req, res) -> (new JoinHandler().handleRequest(req, res, userAuth, game)));
-//        Spark.delete("/db", (req, res) -> handler);
+        Spark.delete("/db", (req, res) -> (new ClearHandler().handleRequest(res, user, userAuth, game)));
     }
 
 }

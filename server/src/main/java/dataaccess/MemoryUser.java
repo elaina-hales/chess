@@ -24,5 +24,8 @@ public class MemoryUser implements UserDAO{
         return Objects.equals(user.password(), password);
     }
 
-
+    @Override
+    public void clear(){
+        users.clear();
+    }
 }

@@ -34,6 +34,16 @@ public class GamesService {
                 throw new BadRequestException("Error: bad request");
             }
         }
+    }
 
+    public CreateResult create(CreateRequest request, String authToken, AuthDAO userAuth, GameDAO games) throws UnauthorizedException {
+        String username = userAuth.getAuth(authToken);
+        if (username == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        } else {
+            String gameName = request.gameName();
+            int gameID = games.createGame(gameName);
+            return new CreateResult(gameID);
+        }
     }
 }
