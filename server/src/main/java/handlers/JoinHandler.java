@@ -10,8 +10,7 @@ import spark.Response;
 
 
 public class JoinHandler {
-    public String handleRequest(Request req, Response res, AuthDAO userAuth, GameDAO games) {
-        Gson gson = new Gson();
+    public String handleRequest(Request req, Response res, AuthDAO userAuth, GameDAO games, Gson gson) {
         try {
             String authToken = req.headers("authorization");
             JoinRequest request = gson.fromJson(req.body(), JoinRequest.class);

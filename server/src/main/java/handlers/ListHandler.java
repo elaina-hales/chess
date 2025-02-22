@@ -9,8 +9,7 @@ import spark.Response;
 
 
 public class ListHandler {
-    public String handleRequest(Request req, Response res, AuthDAO userAuth, GameDAO game) {
-        Gson gson = new Gson();
+    public String handleRequest(Request req, Response res, AuthDAO userAuth, GameDAO game, Gson gson) {
         try {
             GamesRequest request = new GamesRequest(req.headers("authorization"));
             GamesService service = new GamesService();

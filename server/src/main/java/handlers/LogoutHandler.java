@@ -9,8 +9,7 @@ import spark.Response;
 
 
 public class LogoutHandler {
-    public String handleRequest(Request req, Response res, UserDAO user, AuthDAO userAuth) {
-        Gson gson = new Gson();
+    public String handleRequest(Request req, Response res, UserDAO user, AuthDAO userAuth, Gson gson) {
         try {
             LogoutRequest request = new LogoutRequest(req.headers("authorization"));
             UserService service = new UserService();

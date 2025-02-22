@@ -9,8 +9,7 @@ import service.*;
 
 
 public class RegisterHandler {
-    public String handleRequest(Request req, Response res, UserDAO user, AuthDAO userAuth) {
-        Gson gson = new Gson();
+    public String handleRequest(Request req, Response res, UserDAO user, AuthDAO userAuth, Gson gson) {
         try {
             RegisterRequest request = gson.fromJson(req.body(), RegisterRequest.class);
             UserService service = new UserService();

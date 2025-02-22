@@ -8,7 +8,8 @@ import java.util.Collection;
 
 
 public class GamesService {
-    public GamesResult listGames(GamesRequest request, AuthDAO userAuth, GameDAO games) throws UnauthorizedException {
+    public GamesResult listGames(GamesRequest request, AuthDAO userAuth, GameDAO games)
+            throws UnauthorizedException {
         String authToken = request.authToken();
         String username = userAuth.getAuth(authToken);
         if (username == null){
@@ -19,7 +20,8 @@ public class GamesService {
         }
     }
 
-    public JoinResult join(JoinRequest request, String authToken, AuthDAO userAuth, GameDAO games) throws UnauthorizedException, BadReqException, AlreadyTakenException {
+    public JoinResult join(JoinRequest request, String authToken, AuthDAO userAuth, GameDAO games)
+            throws UnauthorizedException, BadReqException, AlreadyTakenException {
         String username = userAuth.getAuth(authToken);
         if (username == null){
             throw new UnauthorizedException("Error: unauthorized");
@@ -36,7 +38,8 @@ public class GamesService {
         }
     }
 
-    public CreateResult create(CreateRequest request, String authToken, AuthDAO userAuth, GameDAO games) throws UnauthorizedException {
+    public CreateResult create(CreateRequest request, String authToken, AuthDAO userAuth, GameDAO games)
+            throws UnauthorizedException {
         String username = userAuth.getAuth(authToken);
         if (username == null) {
             throw new UnauthorizedException("Error: unauthorized");
