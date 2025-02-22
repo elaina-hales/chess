@@ -25,11 +25,11 @@ public class GamesService {
             throw new UnauthorizedException("Error: unauthorized");
         } else {
             String playerColor = request.playerColor();
-            int gameID = request.GameID();
+            int gameID = request.gameID();
             GameData game = games.getGame(gameID);
             if (game != null) {
                 games.updateGame(gameID, playerColor, username);
-                return new JoinResult(playerColor, gameID);
+                return new JoinResult();
             } else {
                 throw new BadRequestException("Error: bad request");
             }

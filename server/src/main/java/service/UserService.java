@@ -4,7 +4,6 @@ import requestsresults.*;
 import dataaccess.*;
 
 public class UserService {
-
     public RegisterResult register(RegisterRequest registerRequest, UserDAO user, AuthDAO userAuth) throws AlreadyTakenException, BadRequestException {
         UserData userResult = user.getUser(registerRequest.username());
         if (userResult == null){
@@ -20,6 +19,7 @@ public class UserService {
             throw new AlreadyTakenException("Error: already taken");
         }
     }
+
     public LoginResult login(LoginRequest loginRequest, UserDAO user, AuthDAO userAuth) throws UnauthorizedException {
         String username = loginRequest.username();
         String password = loginRequest.password();

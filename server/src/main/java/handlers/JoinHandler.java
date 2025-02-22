@@ -16,7 +16,7 @@ public class JoinHandler {
             String authToken = req.headers("authorization");
             JoinRequest request = gson.fromJson(req.body(), JoinRequest.class);
             GamesService service = new GamesService();
-            if (request.GameID() <= 0 || request.playerColor() == null) {
+            if (request.playerColor() == null) {
                 throw new BadRequestException("Error: bad request");
             } else {
                 JoinResult result = service.join(request, authToken, userAuth, games);

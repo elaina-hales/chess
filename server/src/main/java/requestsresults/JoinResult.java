@@ -1,4 +1,4 @@
 package requestsresults;
 
-public record JoinResult(String playerColor, int gameID){
+public record JoinResult(){
 }
