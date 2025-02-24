@@ -38,5 +38,4 @@ public class Server {
         Spark.put("/game", (req, res) -> (new JoinHandler().handleRequest(req, res, userAuth, game, gson)));
         Spark.delete("/db", (req, res) -> (new ClearHandler().handleRequest(res, user, userAuth, game, gson)));
     }
-
 }

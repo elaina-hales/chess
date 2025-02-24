@@ -8,7 +8,7 @@ import spark.Request;
 import spark.Response;
 
 
-public class CreateHandler {
+public class CreateHandler extends ParentHandler {
     public String handleRequest(Request req, Response res, AuthDAO userAuth, GameDAO games, Gson gson) {
         try {
             String authToken = req.headers("authorization");
@@ -20,18 +20,8 @@ public class CreateHandler {
                 CreateResult result = service.create(request, authToken, userAuth, games);
                 return gson.toJson(result);
             }
-        } catch (UnauthorizedException u) {
-            res.status(401);
-            Error err = new Error(u.getMessage());
-            return gson.toJson(err);
-        } catch (BadReqException b) {
-            res.status(400);
-            Error err = new Error(b.getMessage());
-            return gson.toJson(err);
-        } catch (Exception e) {
-            res.status(500);
-            Error err = new Error(e.getMessage());
-            return gson.toJson(err);
+        }  catch (Exception e) {
+            return handleError(res, e, gson);
         }
     }
 }
