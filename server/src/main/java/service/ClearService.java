@@ -6,7 +6,7 @@ import dataaccess.UserDAO;
 import requestsresults.*;
 
 public class ClearService {
-    public ClearResult clear(UserDAO user, AuthDAO userAuth, GameDAO games) throws UnauthorizedException {
+    public ClearResult clear(UserDAO user, AuthDAO userAuth, GameDAO games) {
         user.clear();
         userAuth.clear();
         games.clear();
