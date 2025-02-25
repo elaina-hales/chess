@@ -10,17 +10,18 @@ class UserServiceTest {
     private UserService service;
     private UserDAO user;
     private AuthDAO auth;
+    private RegisterRequest req;
 
     @BeforeEach
     void setUp() {
         service = new UserService();
         user = new MemoryUser();
         auth = new MemoryAuth();
+        req = new RegisterRequest("test", "password", "test@gmail.com");
     }
 
     @Test
     void testRegisterSuccess() {
-        RegisterRequest req = new RegisterRequest("test", "password", "test@gmail.com");
         Assertions.assertDoesNotThrow(() -> {
             service.register(req, user, auth);
         });
@@ -28,7 +29,6 @@ class UserServiceTest {
 
     @Test
     void testRegisterAlreadyTaken() throws BadReqException, AlreadyTakenException {
-        RegisterRequest req = new RegisterRequest("test", "password", "test@gmail.com");
         service.register(req, user, auth);
 
         AlreadyTakenException exception = Assertions.assertThrows(AlreadyTakenException.class, () -> {
@@ -40,7 +40,6 @@ class UserServiceTest {
 
     @Test
     void testLoginSuccess() throws BadReqException, AlreadyTakenException {
-        RegisterRequest req = new RegisterRequest("test", "password", "test@gmail.com");
         service.register(req, user, auth);
 
         LoginRequest loginReq = new LoginRequest("test", "password");
@@ -52,7 +51,6 @@ class UserServiceTest {
 
     @Test
     void testLoginUnauthorized() throws BadReqException, AlreadyTakenException {
-        RegisterRequest req = new RegisterRequest("test", "password", "test@gmail.com");
         service.register(req, user, auth);
 
         LoginRequest loginReq = new LoginRequest("test", "idk");
@@ -66,7 +64,6 @@ class UserServiceTest {
 
     @Test
     void testLogoutSuccess() throws BadReqException, AlreadyTakenException {
-        RegisterRequest req = new RegisterRequest("test", "password", "test@gmail.com");
         RegisterResult res = service.register(req, user, auth);
         LogoutRequest logoutReq = new LogoutRequest(res.authToken());
 
@@ -77,7 +74,6 @@ class UserServiceTest {
 
     @Test
     void testLogoutUnauthorized() throws BadReqException, AlreadyTakenException {
-        RegisterRequest req = new RegisterRequest("test", "password", "test@gmail.com");
         service.register(req, user, auth);
         LogoutRequest logoutReq = new LogoutRequest("akjdhak=sjkhdkaj-akjfkajnck");
 
