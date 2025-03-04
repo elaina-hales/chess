@@ -18,7 +18,7 @@
 - remove movements that thought could make but may be check moves
 - Stalemate: no possible moves that would not put my king in check
 
-### Phase 2:
+### Phase 2 and 3:
 - create sequence diagrams to represent your understanding of the phase 3 spec
 - can receive 0, 50, 100 on it. You have one week after receiving feedback to resubmit if you do poorly
 - requests come in and hit the server as handlers, which you will write
@@ -31,3 +31,11 @@
 - request objects are json related classes and objects, use gson to parse that, gson then sends back appropriate result
 - Handler classes: receive a request from a client and then looks at the request data that comes in, convert into a json object then passes into the service classes
 - requests and responses should be record classes
+
+### Phase 4:
+- you must write jdbc code to create your database
+- take a look at DatabaseAccessExample.java in the slides for relational databases 
+- database creator should be called every time your server is started, use a parent class with a static initializer and then three separate auth, user, and game classes
+- have to add code to databaseManager.java bc it does not create your tables 
+- you must hash passwords when you store them in the db
+- you cannot know what your password is based on the hash
