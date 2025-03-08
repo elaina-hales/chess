@@ -68,7 +68,7 @@ public class DatabaseManager {
                 WhiteUsername varchar(255),
                 BlackUsername varchar(255),
                 GameName varchar(255) NOT NULL,
-                ChessGame varchar(255),
+                ChessGame varchar(255) NOT NULL,
                 PRIMARY KEY (GameID));"""
     };
 
