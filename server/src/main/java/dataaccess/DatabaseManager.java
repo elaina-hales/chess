@@ -9,6 +9,8 @@ public class DatabaseManager {
     private static final String PASSWORD;
     private static final String CONNECTION_URL;
 
+
+
     /*
      * Load the database information for the db.properties file.
      */
@@ -45,6 +47,45 @@ public class DatabaseManager {
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
+        }
+    }
+
+    private static final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS User_Auth (
+                Username varchar(255) NOT NULL,
+                Authtoken varchar(255) NOT NULL,
+                PRIMARY KEY (Username));""",
+
+            """
+            CREATE TABLE IF NOT EXISTS User (
+                Username varchar(255) NOT NULL,
+                Password varchar(255) NOT NULL,
+                Email varchar(255) NOT NULL,
+                PRIMARY KEY (Username));""",
+            """
+            CREATE TABLE IF NOT EXISTS Game (
+                GameID int NOT NULL,
+                WhiteUsername varchar(255),
+                BlackUsername varchar(255),
+                GameName varchar(255) NOT NULL,
+                ChessGame varchar(255),
+                PRIMARY KEY (GameID));"""
+    };
+
+    /**
+     * Creates the database tables if they do not already exist.
+     */
+    public static void configureDatabase() throws DataAccessException {
+        createDatabase();
+        try (var conn = getConnection()) {
+            for (var statement : createStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
 

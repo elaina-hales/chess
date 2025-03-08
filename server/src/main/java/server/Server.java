@@ -4,6 +4,8 @@ import dataaccess.*;
 import handlers.*;
 import spark.*;
 
+import javax.xml.crypto.Data;
+
 public class Server {
 
     public int run(int desiredPort) {
@@ -11,7 +13,11 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        createRoutes();
+        try {
+            createRoutes();
+        } catch(DataAccessException d){
+            System.out.println(d.getMessage());
+        }
 
         //This line initializes the server and can be removed once you have a functioning endpoint
         Spark.init();
@@ -25,7 +31,8 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private static void createRoutes() {
+    private static void createRoutes() throws DataAccessException {
+        DatabaseManager.configureDatabase();
         UserDAO user = new MemoryUser();
         AuthDAO userAuth = new MemoryAuth();
         GameDAO game = new MemoryGame();
