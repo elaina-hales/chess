@@ -56,7 +56,6 @@ public class DatabaseManager {
                 Username varchar(255) NOT NULL,
                 Authtoken varchar(255) NOT NULL,
                 PRIMARY KEY (Username));""",
-
             """
             CREATE TABLE IF NOT EXISTS User (
                 Username varchar(255) NOT NULL,

@@ -24,7 +24,8 @@ public class UserService {
         String username = loginRequest.username();
         String password = loginRequest.password();
         UserData userResult = user.getUser(loginRequest.username());
-        if (userResult != null){
+        String existingAuth = userAuth.getAuth(username);
+        if ((userResult != null) && (existingAuth == null)) {
             if (username != null && password != null && user.isPassMatch(username, password)){
                 String authToken = userAuth.createAuth(username);
                 return new LoginResult(username, authToken);
