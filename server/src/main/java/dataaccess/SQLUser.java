@@ -29,18 +29,23 @@ public class SQLUser implements UserDAO{
 
     @Override
     public UserData getUser(String username) {
+        String userResult = null;
+        String passResult = null;
+        String emailResult = null;
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT Username, password, email FROM User WHERE Username=?";
+            var statement = "SELECT Username, Password, Email FROM User WHERE Username=?";
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, username);
                 try (var rs = preparedStatement.executeQuery()) {
-                    while (rs.next()) {
-                        String u = rs.getString("Username");
-                        String p = rs.getString("Password");
-                        String e = rs.getString("Email");
-
-                        return new UserData(u, p, e);
+                    while (rs.next()){
+                        userResult = rs.getString("Username");
+                        passResult = rs.getString("Password");
+                        emailResult = rs.getString("Email");
                     }
+                    if ((userResult == null) && (passResult == null) && (emailResult == null)){
+                        return null;
+                    }
+                    return new UserData(userResult, passResult, emailResult);
                 }
             }
         } catch (Exception e) {
@@ -51,11 +56,19 @@ public class SQLUser implements UserDAO{
     @Override
     public Boolean isPassMatch(String username, String password) {
         UserData user = getUser(username);
-        return user.password().equals(password);
+        String hashedPassword = user.password();
+        return BCrypt.checkpw(password, hashedPassword);
     }
 
     @Override
     public void clear(){
-        users.clear();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "TRUNCATE User";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
