@@ -33,9 +33,9 @@ public class Server {
 
     private static void createRoutes() throws DataAccessException {
         DatabaseManager.configureDatabase();
-        UserDAO user = new MemoryUser();
-        AuthDAO userAuth = new MemoryAuth();
-        GameDAO game = new MemoryGame();
+        UserDAO user = new SQLUser();
+        AuthDAO userAuth = new SQLAuth();
+        GameDAO game = new SQLGame();
         Gson gson = new Gson();
         Spark.post("/user", (req, res) -> (new RegisterHandler()).handleRequest(req, res, user, userAuth, gson));
         Spark.post("/session", (req, res) -> (new LoginHandler()).handleRequest(req, res, user, userAuth, gson));
