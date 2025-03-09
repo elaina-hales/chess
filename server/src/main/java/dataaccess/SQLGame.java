@@ -44,6 +44,7 @@ public class SQLGame implements GameDAO{
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT * FROM Game WHERE GameID=?";
             try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setInt(1, gameID);
                 try (var rs = preparedStatement.executeQuery()) {
                     while (rs.next()){
                         int id = rs.getInt("GameID");
@@ -86,6 +87,33 @@ public class SQLGame implements GameDAO{
         }
     }
 
+    private boolean userTaken(int gameID, String color) {
+        var statement = "";
+        String user = "";
+        if (color.equals("WHITE")) {
+            statement = "SELECT WhiteUsername FROM Game WHERE GameID=?";
+        } else if (color.equals("BLACK")) {
+            statement = "SELECT BlackUsername FROM Game WHERE GameID=?";
+        }
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setInt(1, gameID);
+                try (var rs = preparedStatement.executeQuery()) {
+                    while (rs.next()){
+                        user = rs.getString("username");
+                    }
+                    if (user.equals("")) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void updateGame(int gameID, String color, String username) throws AlreadyTakenException, BadReqException {
         var statement = "";
@@ -95,38 +123,17 @@ public class SQLGame implements GameDAO{
             } else if (color.equals("BLACK")) {
                 statement = "UPDATE Game SET BlackUsername=? WHERE GameID=?";
             }
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.setString(1, username);
-
-                preparedStatement.executeUpdate();} catch (Exception e) {
+            if (userTaken(gameID, color)) {
+                throw new AlreadyTakenException("Error: already taken");
+            } else {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.setString(1, username);
+                    preparedStatement.executeUpdate();
+                }
             }
+
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-            GameData game = getGame(gameID);
-            if (color.equals("BLACK")) {
-                if (game.blackUsername() == null) {
-                    String wUser = game.whiteUsername();
-                    String gameName = game.gameName();
-                    GameData updatedGame = new GameData(gameID, wUser, username, gameName, game.game());
-                    games.add(updatedGame);
-                    games.remove(game);
-                } else {
-                    throw new AlreadyTakenException("Error: already taken");
-                }
-            } else if (color.equals("WHITE")) {
-                if (game.whiteUsername() == null) {
-                    String bUser = game.blackUsername();
-                    String gameName = game.gameName();
-                    GameData updatedGame = new GameData(gameID, username, bUser, gameName, game.game());
-                    games.add(updatedGame);
-                    games.remove(game);
-                } else {
-                    throw new AlreadyTakenException("Error: already taken");
-                }
-            } else {
-                throw new BadReqException("Error: bad request");
-            }
         }
     }
 
