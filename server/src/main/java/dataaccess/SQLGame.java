@@ -92,9 +92,12 @@ public class SQLGame implements GameDAO{
     private boolean userTaken(int gameID, String color) {
         var statement = "";
         String user = null;
+        String userType = "";
         if (color.equals("WHITE")) {
+            userType = "WhiteUsername";
             statement = "SELECT WhiteUsername FROM Game WHERE GameID=?";
         } else if (color.equals("BLACK")) {
+            userType = "BlackUsername";
             statement = "SELECT BlackUsername FROM Game WHERE GameID=?";
         }
         try (var conn = DatabaseManager.getConnection()) {
@@ -102,11 +105,7 @@ public class SQLGame implements GameDAO{
                 preparedStatement.setInt(1, gameID);
                 try (var rs = preparedStatement.executeQuery()) {
                     while (rs.next()){
-                        if (color.equals("WHITE")) {
-                            user = rs.getString("WhiteUsername");
-                        } else {
-                            user = rs.getString("BlackUsername");
-                        }
+                        user = rs.getString(userType);
                     }
                     return user == null;
                 }

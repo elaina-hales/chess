@@ -1,9 +1,6 @@
 package handlers;
 
 import com.google.gson.Gson;
-import service.AlreadyTakenException;
-import service.BadReqException;
-import service.UnauthorizedException;
 import spark.Response;
 
 import java.util.Objects;
