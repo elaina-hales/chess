@@ -6,6 +6,7 @@ import model.GameData;
 import service.AlreadyTakenException;
 import service.BadReqException;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
@@ -89,7 +90,7 @@ public class SQLGame implements GameDAO{
 
     private boolean userTaken(int gameID, String color) {
         var statement = "";
-        String user = "";
+        String user = null;
         if (color.equals("WHITE")) {
             statement = "SELECT WhiteUsername FROM Game WHERE GameID=?";
         } else if (color.equals("BLACK")) {
@@ -100,13 +101,13 @@ public class SQLGame implements GameDAO{
                 preparedStatement.setInt(1, gameID);
                 try (var rs = preparedStatement.executeQuery()) {
                     while (rs.next()){
-                        user = rs.getString("username");
+                        if (color.equals("WHITE")) {
+                            user = rs.getString("WhiteUsername");
+                        } else {
+                            user = rs.getString("BlackUsername");
+                        }
                     }
-                    if (user.equals("")) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return user == null;
                 }
             }
         } catch (Exception e) {
@@ -122,17 +123,20 @@ public class SQLGame implements GameDAO{
                 statement = "UPDATE Game SET WhiteUsername=? WHERE GameID=?";
             } else if (color.equals("BLACK")) {
                 statement = "UPDATE Game SET BlackUsername=? WHERE GameID=?";
+            } else {
+                throw new BadReqException("Error: bad request");
             }
-            if (userTaken(gameID, color)) {
+            if (!userTaken(gameID, color)) {
                 throw new AlreadyTakenException("Error: already taken");
             } else {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.setString(1, username);
+                    preparedStatement.setInt(2, gameID);
+
                     preparedStatement.executeUpdate();
                 }
             }
-
-        } catch (Exception e) {
+        } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
