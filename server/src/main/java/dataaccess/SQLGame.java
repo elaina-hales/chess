@@ -65,6 +65,7 @@ public class SQLGame implements GameDAO{
         }
     }
 
+
     @Override
     public int createGame(String gameName) {
         Random random = new Random();
