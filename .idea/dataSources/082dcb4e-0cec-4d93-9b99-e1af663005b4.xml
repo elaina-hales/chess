@@ -1018,7 +1018,7 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </schema>
     <schema id="292" parent="1" name="chess">
-      <LastIntrospectionLocalTimestamp>2025-03-08.22:57:33</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2025-03-12.18:09:03</LastIntrospectionLocalTimestamp>
       <CollationName>utf8mb4_0900_ai_ci</CollationName>
     </schema>
     <user id="293" parent="1" name="mysql.infoschema">
@@ -24350,8 +24350,9 @@ VARIABLE_NAME</ColNames>
       <StoredType>varchar(255)|0s</StoredType>
     </column>
     <column id="4671" parent="680" name="ChessGame">
+      <NotNull>1</NotNull>
       <Position>5</Position>
-      <StoredType>varchar(255)|0s</StoredType>
+      <StoredType>mediumtext|0s</StoredType>
     </column>
     <index id="4672" parent="680" name="PRIMARY">
       <ColNames>GameID</ColNames>

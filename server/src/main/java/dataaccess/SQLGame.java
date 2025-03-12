@@ -13,6 +13,7 @@ import java.util.Random;
 
 
 public class SQLGame implements GameDAO{
+
     @Override
     public Collection<GameData> listGames() {
         Collection<GameData> games = new ArrayList<>();
