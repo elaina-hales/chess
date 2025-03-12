@@ -8,10 +8,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.AlreadyTakenException;
-import service.BadReqException;
-
-import java.util.Collection;
 
 class AuthDAOTest {
     private UserDAO user;
@@ -31,20 +27,14 @@ class AuthDAOTest {
 
     @Test
     void testCreateAuthDAOSuccess() {
-        UserData tmpUser = new UserData("user1", "pass", "email");
-        user.createUser(tmpUser);
-
         String authtoken = auth.createAuth("user1");
         Assertions.assertNotNull(authtoken);
     }
 
     @Test
     void testCreateAuthNullUser() {
-        UserData tmpUser = new UserData("user1", "pass", "email");
-        user.createUser(tmpUser);
-
         Assertions.assertThrows(RuntimeException.class, () -> {
-            auth.createAuth("user1");
+            auth.createAuth(null);
         });
     }
 
