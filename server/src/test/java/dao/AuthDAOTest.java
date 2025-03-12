@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 class AuthDAOTest {
     private UserDAO user;
     private AuthDAO auth;
@@ -38,55 +41,69 @@ class AuthDAOTest {
         });
     }
 
+    @Test
+    void testGetAuthDAOSuccess() {
+        String authtoken = auth.createAuth("user1");
+        String gottenAuthtoken = auth.getAuth(authtoken);
 
-//    @Test
-//    void testGetGameSuccess(){
-//        int gameID = game.createGame("test1");
-//
-//        GameData actual = game.getGame(gameID);
-//        GameData expected = new GameData(gameID, null, null, "test1", new ChessGame());
-//        Assertions.assertEquals(actual, expected);
-//    }
-//
-//    @Test
-//    void testGetNonExistentGame(){
-//        game.createGame("test1");
-//
-//        GameData actual = game.getGame(0);
-//        Assertions.assertNull(actual);
-//    }
-//
-//    @Test
-//    void createGameDAOSuccess(){
-//        int gameID = game.createGame("test");
-//        GameData gottenGame = game.getGame(gameID);
-//
-//        Assertions.assertNotNull(gottenGame);
-//
-//    }
-//
-//    @Test
-//    void createGameDAONullGame(){
-//        Assertions.assertThrows(RuntimeException.class, () -> {
-//            game.createGame(null);
-//        });
-//    }
-//
-//    @Test
-//    void testUpdateGameDAOSuccess() throws BadReqException, AlreadyTakenException {
-//        int gameID = game.createGame("test");
-//        game.updateGame(gameID, "BLACK", "user");
-//        GameData actual = game.getGame(gameID);
-//
-//        Assertions.assertEquals("user", actual.blackUsername());
-//    }
-//
-//    @Test
-//    void testUpdateGameDAOUserAlreadyTaken() throws BadReqException, AlreadyTakenException {
-//        int gameID = game.createGame("test");
-//        game.updateGame(gameID, "BLACK", "user");
-//        Assertions.assertThrows(AlreadyTakenException.class, () -> {
-//            game.updateGame(gameID, "BLACK", "another user");
-//        });
-//    }
+        Assertions.assertNotNull(gottenAuthtoken);
+    }
+
+    @Test
+    void testGetNonExistentAuthDAO() {
+        String gottenAuthtoken = auth.getAuth("akjhfkjaf aljfha not valid");
+        Assertions.assertNull(gottenAuthtoken);
+    }
+
+
+    @Test
+    void testDeleteAuthDAOSuccess() {
+        String authtoken = auth.createAuth("user1");
+        auth.deleteAuth(authtoken);
+        Assertions.assertNull(auth.getAuth(authtoken));
+    }
+
+    @Test
+    void testDeleteAuthNonExistentDAO() {
+
+        Collection<String> previous = new ArrayList<>();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM User_Auth";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                try (var rs = preparedStatement.executeQuery()) {
+                    while (rs.next()){
+                        String username = rs.getString("Username");
+                        String authtoken = rs.getString("Authtoken");
+
+                        previous.add(username);
+                        previous.add(authtoken);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        auth.deleteAuth("kjshdk this does not exist");
+
+        Collection<String> current = new ArrayList<>();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM User_Auth";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                try (var rs = preparedStatement.executeQuery()) {
+                    while (rs.next()){
+                        String username = rs.getString("Username");
+                        String authtoken = rs.getString("Authtoken");
+
+                        current.add(username);
+                        current.add(authtoken);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        Assertions.assertEquals(previous, current);
+    }
 }
