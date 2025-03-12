@@ -26,7 +26,7 @@
 - should be able to clear database, register, login
 - gson needs a class that matches gson string
 - Model is a set of record classes, they should be strung together in a package
-- Data Access object-- arraylist of game data, another package called dao - info about how to access data
+- Data Access object-- arraylist of game data, another package called dataaccess - info about how to access data
 - Service classes: business logic goes here, does the actual logic for data access and models
 - request objects are json related classes and objects, use gson to parse that, gson then sends back appropriate result
 - Handler classes: receive a request from a client and then looks at the request data that comes in, convert into a json object then passes into the service classes
