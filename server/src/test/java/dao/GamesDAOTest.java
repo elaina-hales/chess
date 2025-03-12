@@ -13,21 +13,15 @@ import java.util.Collection;
 
 class GamesDAOTest {
     private GameDAO game;
-    private UserDAO user;
-    private AuthDAO auth;
 
     @BeforeEach
     void setUp() {
         game = new SQLGame();
-        user = new SQLUser();
-        auth = new SQLAuth();
     }
 
     @AfterEach
     void tearDown() {
         game.clear();
-        user.clear();
-        auth.clear();
     }
 
     @Test
@@ -47,6 +41,12 @@ class GamesDAOTest {
         }
 
         Assertions.assertTrue(correct);
+    }
+
+    @Test
+    void testListGamesDAONoGames(){
+        Collection<GameData> actual = game.listGames();
+        Assertions.assertTrue(actual.isEmpty());
     }
 
     // still neeed a bad case

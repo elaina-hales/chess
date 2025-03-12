@@ -21,7 +21,6 @@ public class SQLAuth implements AuthDAO{
                 return authToken;
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
     }
