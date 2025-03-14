@@ -3,6 +3,7 @@ package menus;
 import chess.ChessGame;
 import consoleRepl.State;
 import model.GameData;
+import ui.DrawChessBoard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,11 +68,13 @@ public class PostLogin {
 
     public static String join(String... params) throws Exception {
         if (params.length >= 2) {
-            var username = params[0];
-            var password = params[1];
-            var email = params[2];
-            // send it over to the server
-            return String.format("You registered as %s and are now signed in\n", username);
+            var id = params[0];
+            var player = params[1];
+            ChessGame chess = new ChessGame();
+            // try to join game and catch errors otherwise join and show the board
+            DrawChessBoard d = new DrawChessBoard();
+            d.draw(chess);
+            return "complete";
         }
         throw new Exception("Expected: <username> <password> <email>\n");
     }
