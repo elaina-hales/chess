@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class PreLogin {
     private static String username = null;
-    public static State state = State.SIGNEDOUT;
+    public static State state = State.LOGGED_OUT;
 
     public PreLogin() {
     }
@@ -29,23 +29,23 @@ public class PreLogin {
 
     public static String signIn(String... params) throws Exception {
         if (params.length >= 1) {
-            state = State.SIGNEDIN;
-            username = String.join("-", params);
-            return String.format("Success! You signed in as %s.", username);
+            state = State.LOGGED_IN;
+            username = params[0];
+            return String.format("Success! You signed in as %s.\n", username);
         }
-        throw new Exception("Expected: <username> <password>");
+        throw new Exception("Expected: <username> <password>\n");
     }
 
     public static String register(String... params) throws Exception {
-        if (params.length >= 2) {
-            state = State.SIGNEDIN;
+        if (params.length >= 3) {
+            state = State.LOGGED_IN;
             var username = params[0];
             var password = params[1];
             var email = params[2];
             // send it over to the server
-            return String.format("You registered as %s and are now signed in", username);
+            return String.format("You registered as %s and are now signed in\n", username);
         }
-        throw new Exception("Expected: <username> <password> <email>");
+        throw new Exception("Expected: <username> <password> <email> \n");
     }
 
     public static String help() {
