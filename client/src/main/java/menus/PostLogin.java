@@ -73,7 +73,7 @@ public class PostLogin {
             ChessGame chess = new ChessGame();
             // try to join game and catch errors otherwise join and show the board
             DrawChessBoard d = new DrawChessBoard();
-            d.draw(chess);
+            d.draw(chess, player);
             return "complete";
         }
         throw new Exception("Expected: <username> <password> <email>\n");
