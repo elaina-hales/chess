@@ -9,6 +9,7 @@ import static consoleRepl.State.*;
 
 
 public class Repl {
+    private State state = LOGGED_OUT;
 
     public void run() {
         System.out.println("Welcome to chess! Sign in to start.");
@@ -20,15 +21,18 @@ public class Repl {
         while (!result.equals("quit")) {
             String line = scanner.nextLine();
             try {
-                if (PreLogin.state == LOGGED_IN) {
-                    System.out.print(PostLogin.help());
+                if (state == LOGGED_IN) {
                     result = PostLogin.eval(line);
                     System.out.print(result);
-                } else if (PreLogin.state == LOGGED_OUT){
+                    state = PostLogin.state;
+                    PreLogin.state = state;
+                } else {
                     result = PreLogin.eval(line);
                     System.out.print(result);
+                    state = PreLogin.state;
+                    PostLogin.state = state;
                 }
-                System.out.print(String.format("[%s] >>> ", PreLogin.state));
+                System.out.print(String.format("[%s] >>> ", state));
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);

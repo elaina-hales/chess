@@ -28,7 +28,7 @@ public class PreLogin {
     }
 
     public static String signIn(String... params) throws Exception {
-        if (params.length >= 1) {
+        if (params.length > 1) {
             state = State.LOGGED_IN;
             username = params[0];
             return String.format("Success! You signed in as %s.\n", username);

@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 public class PostLogin {
     private static String username = null;
+    public static State state = State.LOGGED_IN;
 
     public PostLogin() {
     }
@@ -16,13 +17,11 @@ public class PostLogin {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "login" -> signIn(params);
                 case "create" -> register(params);
                 case "list" -> register(params);
                 case "play" -> register(params);
                 case "observe" -> register(params);
-                case "logout" -> register(params);
-                case "quit" -> "quit";
+                case "logout" -> logOut(params);
                 default -> help();
             };
         } catch (Exception ex) {
@@ -30,12 +29,10 @@ public class PostLogin {
         }
     }
 
-    public static String signIn(String... params) throws Exception {
-        if (params.length >= 1) {
-            username = params[0];
-            return String.format("Success! You signed in as %s.\n", username);
-        }
-        throw new Exception("Expected: <username> <password>\n");
+    public static String logOut(String... params) {
+        state = State.LOGGED_OUT;
+        PreLogin.state = State.LOGGED_OUT;
+        return "Success! You have now logged out.\n";
     }
 
     public static String register(String... params) throws Exception {
@@ -52,7 +49,11 @@ public class PostLogin {
 
     public static String help() {
         return """
-                    \npostlogin help menu
+                    create <game name>
+                    list
+                    play <game name> 
+                    observe <game name>
+                    logout
                 """;
     }
 }
