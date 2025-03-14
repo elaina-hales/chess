@@ -50,10 +50,10 @@ public class PreLogin {
 
     public static String help() {
         return """
-                    login <username> <password>
-                    register <username> <password> <email>
-                    help
-                    quit
+                    login <username> <password> - to play chess
+                    register <username> <password> <email> - to create an account
+                    help - possible commands
+                    quit - exit chess
                 """;
     }
 }

@@ -32,7 +32,11 @@ public class Repl {
                     state = PreLogin.state;
                     PostLogin.state = state;
                 }
-                System.out.print(String.format("[%s] >>> ", state));
+                if (result.equals("quit")){
+                    break;
+                } else {
+                    System.out.print(String.format("[%s] >>> ", state));
+                }
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
