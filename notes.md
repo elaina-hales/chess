@@ -39,3 +39,22 @@
 - have to add code to databaseManager.java bc it does not create your tables 
 - you must hash passwords when you store them in the db
 - you cannot know what your password is based on the hash
+
+### Phase 5:
+To do:
+- draw menus and handle input
+- draw chess board -- do this first
+- invoke server API endpoints 
+- write tests
+Other:
+- you must allow multiple instances to run things
+- three menus -- login/register, quit ; join game menu; move menu
+- observe game is just draw board in its initial state -- do not have to make moves
+- serverFacade class goes in a .net package (network)
+  - when they choose login method, create a LoginRequest obj and call serverFacade class (returns loginResult)
+  - when they choose register, take a registerRequest and return registerResult
+  - create a UI package for the console ui
+  - ui.chessboard should have black/white passed in as an enum so you can figure out how to draw it 
+  - there are unicode chess characters
+  - try to not hardcode the rows, check and see if a piece needs to be rendered there
+  - client should not know how to draw the board
