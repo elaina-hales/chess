@@ -1,15 +1,18 @@
 package consoleRepl;
 
+import menus.GameMenu;
 import menus.PostLogin;
 import menus.PreLogin;
 
 import java.util.Scanner;
 
 import static consoleRepl.State.*;
+import static consoleRepl.GameState.*;
 
 
 public class Repl {
     private State state = LOGGED_OUT;
+    private GameState joined = NOT_JOINED;
 
     public void run() {
         System.out.println("Welcome to chess! Sign in to start.");
@@ -22,10 +25,17 @@ public class Repl {
             String line = scanner.nextLine();
             try {
                 if (state == LOGGED_IN) {
-                    result = PostLogin.eval(line);
-                    System.out.print(result);
-                    state = PostLogin.state;
-                    PreLogin.state = state;
+                    if (joined == JOINED_GAME){
+                        result = GameMenu.eval(line);
+                        System.out.print(result);
+                        joined = GameMenu.joined;
+                    } else {
+                        result = PostLogin.eval(line);
+                        System.out.print(result);
+                        state = PostLogin.state;
+                        PreLogin.state = state;
+                        joined = PostLogin.joined;
+                    }
                 } else {
                     result = PreLogin.eval(line);
                     System.out.print(result);

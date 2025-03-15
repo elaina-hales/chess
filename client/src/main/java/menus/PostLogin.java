@@ -1,6 +1,7 @@
 package menus;
 
 import chess.ChessGame;
+import consoleRepl.GameState;
 import consoleRepl.State;
 import model.GameData;
 import ui.DrawChessBoard;
@@ -12,6 +13,7 @@ import java.util.Collection;
 public class PostLogin {
     private static String username = null;
     public static State state = State.LOGGED_IN;
+    public static GameState joined = GameState.NOT_JOINED;
 
     public PostLogin() {
     }
@@ -71,22 +73,29 @@ public class PostLogin {
             var id = params[0];
             var player = params[1];
             ChessGame chess = new ChessGame();
+            joined = GameState.JOINED_GAME;
+            GameMenu.joined = GameState.JOINED_GAME;
             // try to join game and catch errors otherwise join and show the board
             DrawChessBoard d = new DrawChessBoard();
             d.draw(chess, player);
-            return "complete";
+
+            return "complete\n";
         }
         throw new Exception("Expected: <username> <password> <email>\n");
     }
 
     public static String observe(String... params) throws Exception {
         if (params.length >= 2) {
-
             var username = params[0];
             var password = params[1];
             var email = params[2];
+            joined = GameState.JOINED_GAME;
+            GameMenu.joined = GameState.JOINED_GAME;
             // send it over to the server
-            return String.format("You registered as %s and are now signed in\n", username);
+            ChessGame chess = new ChessGame();
+            DrawChessBoard d = new DrawChessBoard();
+            d.draw(chess, "white");
+            return "Complete\n";
         }
         throw new Exception("Expected: <username> <password> <email>\n");
     }

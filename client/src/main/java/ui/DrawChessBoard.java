@@ -30,6 +30,7 @@ public class DrawChessBoard {
         out.print(header);
         out.print(RESET_TEXT_COLOR);
         out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_BOLD_FAINT);
     }
 
 
