@@ -72,44 +72,38 @@ public class PostLogin {
         if (params.length >= 2) {
             var id = params[0];
             var player = params[1];
-            ChessGame chess = new ChessGame();
-            joined = GameState.JOINED_GAME;
-            GameMenu.joined = GameState.JOINED_GAME;
-            // try to join game and catch errors otherwise join and show the board
-            DrawChessBoard d = new DrawChessBoard();
-            d.draw(chess, player);
-
-            return "complete\n";
+            if ((player.equals("WHITE")) || (player.equals("BLACK"))) {
+                ChessGame chess = new ChessGame();
+                joined = GameState.JOINED_GAME;
+                GameMenu.joined = GameState.JOINED_GAME;
+                // try to join game and catch errors otherwise join and show the board
+                DrawChessBoard d = new DrawChessBoard();
+                d.draw(chess, player);
+                return help();
+            }
         }
-        throw new Exception("Expected: <username> <password> <email>\n");
+        throw new Exception("Expected: <id> <WHITE|BLACK>\n");
     }
 
     public static String observe(String... params) throws Exception {
-        if (params.length >= 2) {
-            var username = params[0];
-            var password = params[1];
-            var email = params[2];
-            joined = GameState.JOINED_GAME;
-            GameMenu.joined = GameState.JOINED_GAME;
-            // send it over to the server
+        if (params.length >= 1) {
+            var id = params[0];
+            // get the requested chess game and display it
             ChessGame chess = new ChessGame();
             DrawChessBoard d = new DrawChessBoard();
             d.draw(chess, "white");
-            return "Complete\n";
+            return "";
         }
-        throw new Exception("Expected: <username> <password> <email>\n");
+        throw new Exception("Expected: <id>\n");
     }
 
     public static String create(String... params) throws Exception {
-        if (params.length >= 2) {
-
-            var username = params[0];
-            var password = params[1];
-            var email = params[2];
-            // send it over to the server
-            return String.format("You registered as %s and are now signed in\n", username);
+        if (params.length >= 1) {
+            var name = params[0];
+            // create the game
+            return String.format("Your game, %s, has been created\n", name);
         }
-        throw new Exception("Expected: <username> <password> <email>\n");
+        throw new Exception("Expected: <game name>\n");
     }
 
     public static String help() {

@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class GameMenu {
-    private static String username = null;
-    public static State state = State.LOGGED_IN;
     public static GameState joined = GameState.JOINED_GAME;
 
     public GameMenu() {
