@@ -6,14 +6,12 @@ import consoleRepl.State;
 import model.GameData;
 import ui.DrawChessBoard;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 public class PostLogin {
-    private static String username = null;
     public static State state = State.LOGGED_IN;
     public static GameState joined = GameState.NOT_JOINED;
+    static HashMap<Integer, String> gamesAndTmpIDs = new HashMap<>();
 
     public PostLogin() {
     }
@@ -49,6 +47,7 @@ public class PostLogin {
         StringBuilder result = new StringBuilder();
         int index = 1;
         for (GameData game: games) {
+            gamesAndTmpIDs.put(index, game.gameName());
             result.append(index).append(". ");
             result.append(game.gameName()).append("\n\tWhite player: ");
             if (game.whiteUsername() != null){
@@ -88,6 +87,7 @@ public class PostLogin {
     public static String observe(String... params) throws Exception {
         if (params.length >= 1) {
             var id = params[0];
+            String gameName = gamesAndTmpIDs.get(id);
             // get the requested chess game and display it
             ChessGame chess = new ChessGame();
             DrawChessBoard d = new DrawChessBoard();
