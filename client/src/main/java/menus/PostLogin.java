@@ -1,6 +1,7 @@
 package menus;
 
 import chess.ChessGame;
+import client.ServerFacade;
 import consoleRepl.GameState;
 import consoleRepl.State;
 import model.GameData;
@@ -16,7 +17,7 @@ public class PostLogin {
     public PostLogin() {
     }
 
-    public static String eval(String input) {
+    public static String eval(String input, ServerFacade server) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";

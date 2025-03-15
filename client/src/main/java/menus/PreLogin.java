@@ -1,5 +1,7 @@
 package menus;
 
+import client.ReturnObject;
+import client.ServerFacade;
 import consoleRepl.State;
 
 import java.util.Arrays;
@@ -11,14 +13,14 @@ public class PreLogin {
     public PreLogin() {
     }
 
-    public static String eval(String input) {
+    public static String eval(String input, ServerFacade server) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "login" -> signIn(params);
-                case "register" -> register(params);
+                case "login" -> signIn(server, params);
+                case "register" -> register(server, params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -27,23 +29,38 @@ public class PreLogin {
         }
     }
 
-    public static String signIn(String... params) throws Exception {
+    public static String signIn(ServerFacade server, String... params) throws Exception {
         if (params.length > 1) {
-            state = State.LOGGED_IN;
             username = params[0];
-            return String.format("Success! You signed in as %s.\n", username);
+            String password = params[1];
+            ReturnObject r = server.login(username, password);
+            if (r.statusCode() == 200){
+                state = State.LOGGED_IN;
+            }
+            return switch (r.statusCode()) {
+                case 200 -> String.format("Success! You signed in as %s.\n", username);
+                case 401 -> "Log in unsuccessful. Please try again.\n";
+                default -> "Server Error: " + r.statusMessage() + "\n";
+            };
         }
         throw new Exception("Expected: <username> <password>\n");
     }
 
-    public static String register(String... params) throws Exception {
+    public static String register(ServerFacade server, String... params) throws Exception {
         if (params.length >= 3) {
-            state = State.LOGGED_IN;
             var username = params[0];
             var password = params[1];
             var email = params[2];
-            // send it over to the server
-            return String.format("You registered as %s and are now signed in\n", username);
+            ReturnObject r = server.register(username, password, email);
+            if (r.statusCode() == 200){
+                state = State.LOGGED_IN;
+            }
+            return switch (r.statusCode()) {
+                case 200 -> String.format("You registered as %s and are now signed in\n", username);
+                case 400 -> "Error: bad request";
+                case 403 -> String.format("Register failed. '%s' is already taken. \n", username);
+                default -> r.statusMessage();
+            };
         }
         throw new Exception("Expected: <username> <password> <email> \n");
     }
