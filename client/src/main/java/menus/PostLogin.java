@@ -1,6 +1,7 @@
 package menus;
 
 import chess.ChessGame;
+import client.ReturnObject;
 import client.ServerFacade;
 import consoleRepl.GameState;
 import consoleRepl.State;
@@ -17,7 +18,7 @@ public class PostLogin {
     public PostLogin() {
     }
 
-    public static String eval(String input, ServerFacade server) {
+    public static String eval(String input, ServerFacade server, String authToken) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
@@ -27,7 +28,7 @@ public class PostLogin {
                 case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
-                case "logout" -> logout();
+                case "logout" -> logout(server, authToken);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -36,10 +37,21 @@ public class PostLogin {
         }
     }
 
-    public static String logout() {
-        state = State.LOGGED_OUT;
-        PreLogin.state = State.LOGGED_OUT;
-        return "You have now logged out.\n";
+    public static String logout(ServerFacade server, String authToken) {
+        try {
+            ReturnObject r = server.logout(authToken);
+            if (r.statusCode() == 200){
+                state = State.LOGGED_OUT;
+                PreLogin.state = State.LOGGED_OUT;
+            }
+            return switch (r.statusCode()) {
+                case 200 -> "You have now logged out.\n";
+                case 401 -> "Log in unsuccessful. Please try again.\n";
+                default -> "Server Error: " + r.statusMessage() + "\n";
+            };
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     public static String list() {

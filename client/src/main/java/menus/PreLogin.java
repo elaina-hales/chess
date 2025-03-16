@@ -5,10 +5,12 @@ import client.ServerFacade;
 import consoleRepl.State;
 
 import java.util.Arrays;
+import java.util.Map;
 
 public class PreLogin {
-    private static String username = null;
+    public static String username = null;
     public static State state = State.LOGGED_OUT;
+    private static String authToken = "";
 
     public PreLogin() {
     }
@@ -36,6 +38,8 @@ public class PreLogin {
             ReturnObject r = server.login(username, password);
             if (r.statusCode() == 200){
                 state = State.LOGGED_IN;
+                Map<String, String> body = r.body();
+                authToken = body.get("authToken");
             }
             return switch (r.statusCode()) {
                 case 200 -> String.format("Success! You signed in as %s.\n", username);
@@ -48,12 +52,14 @@ public class PreLogin {
 
     public static String register(ServerFacade server, String... params) throws Exception {
         if (params.length >= 3) {
-            var username = params[0];
+            username = params[0];
             var password = params[1];
             var email = params[2];
             ReturnObject r = server.register(username, password, email);
             if (r.statusCode() == 200){
                 state = State.LOGGED_IN;
+                Map<String, String> o = r.body();
+                authToken = o.get("authToken");
             }
             return switch (r.statusCode()) {
                 case 200 -> String.format("You registered as %s and are now signed in\n", username);
@@ -63,6 +69,10 @@ public class PreLogin {
             };
         }
         throw new Exception("Expected: <username> <password> <email> \n");
+    }
+
+    public static String getToken(){
+        return authToken;
     }
 
     public static String help() {
