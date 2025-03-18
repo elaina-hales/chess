@@ -93,6 +93,21 @@ public class ServerFacadeTests {
                 (actual.statusMessage().equals("Unauthorized")));
     }
 
+    @Test
+    public void testCreateGameSuccess() throws IOException, URISyntaxException {
+        ReturnObject r = facade.register("test", "test", "p1@email.com");
+        String authToken = r.body().get("authToken");
+        ReturnObject actual = facade.create(authToken, "testGame");
+        assertTrue(actual.statusCode() == 200);
+    }
+
+    @Test
+    public void testCreateGameUnauthorized() throws IOException, URISyntaxException {
+        facade.register("test", "test", "p1@email.com");
+        ReturnObject actual = facade.create("popopopop", "testGame");
+        assertTrue(actual.statusCode() == 401);
+    }
+
 
 
 
