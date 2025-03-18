@@ -1,4 +1,4 @@
-package consoleRepl;
+package repl;
 
 import client.ServerFacade;
 import menus.GameMenu;
@@ -7,8 +7,8 @@ import menus.PreLogin;
 
 import java.util.Scanner;
 
-import static consoleRepl.State.*;
-import static consoleRepl.GameState.*;
+import static repl.State.*;
+import static repl.GameState.*;
 
 
 public class Repl {

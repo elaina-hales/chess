@@ -1,15 +1,9 @@
 package menus;
 
-import chess.ChessGame;
 import client.ServerFacade;
-import consoleRepl.GameState;
-import consoleRepl.State;
-import model.GameData;
-import ui.DrawChessBoard;
+import repl.GameState;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 
 public class GameMenu {
     public static GameState joined = GameState.JOINED_GAME;

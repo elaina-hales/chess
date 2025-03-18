@@ -1,4 +1,4 @@
-package consoleRepl;
+package repl;
 
 public enum State {
     LOGGED_OUT,

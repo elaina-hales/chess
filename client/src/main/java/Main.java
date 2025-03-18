@@ -1,6 +1,5 @@
-import chess.*;
 import client.ServerFacade;
-import consoleRepl.Repl;
+import repl.Repl;
 
 public class Main {
     public static void main(String[] args) {
