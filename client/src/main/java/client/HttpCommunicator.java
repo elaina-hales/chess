@@ -10,7 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-public class httpCommunicator {
+public class HttpCommunicator {
     public static HttpURLConnection sendRequest(String authToken, String url, String method, String body) throws URISyntaxException, IOException {
         URI uri = new URI(url);
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
@@ -36,16 +36,14 @@ public class httpCommunicator {
         var statusCode = http.getResponseCode();
         var statusMessage = http.getResponseMessage();
         Map<String, String> responseBody = readResponseBody(statusCode, http);
-        ReturnObject r = new ReturnObject(statusCode, statusMessage, responseBody);
-        return r;
+        return new ReturnObject(statusCode, statusMessage, responseBody);
     }
 
     public static ReturnGamesObject receiveResponseGames(HttpURLConnection http) throws IOException {
         var statusCode = http.getResponseCode();
         var statusMessage = http.getResponseMessage();
         GamesResult responseBody = readResponseListGames(statusCode, http);
-        ReturnGamesObject r = new ReturnGamesObject(statusCode, statusMessage, responseBody);
-        return r;
+        return new ReturnGamesObject(statusCode, statusMessage, responseBody);
     }
 
     public static Map<String, String> readResponseBody(int statusCode, HttpURLConnection http) throws IOException {

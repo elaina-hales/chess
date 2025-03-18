@@ -7,7 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import static client.httpCommunicator.*;
+import static client.HttpCommunicator.*;
 
 
 public class ServerFacade {
