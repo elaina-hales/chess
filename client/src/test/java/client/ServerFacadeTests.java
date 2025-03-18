@@ -69,6 +69,32 @@ public class ServerFacadeTests {
         assertTrue(actual.statusCode() == 200);
     }
 
+    @Test
+    public void testLogoutUnauthorized() throws IOException, URISyntaxException {
+        facade.register("test", "test", "p1@email.com");
+        ReturnObject actual = facade.logout("not a valid auth");
+        assertTrue((actual.statusCode() == 401) &&
+                (actual.statusMessage().equals("Unauthorized")));
+    }
+
+    @Test
+    public void testListSuccess() throws IOException, URISyntaxException {
+        ReturnObject r = facade.register("test", "test", "p1@email.com");
+        String authToken = r.body().get("authToken");
+        ReturnGamesObject actual = facade.listGames(authToken);
+        assertTrue(actual.statusCode() == 200);
+    }
+
+    @Test
+    public void testListUnauthorized() throws IOException, URISyntaxException {
+        facade.register("test", "test", "p1@email.com");
+        ReturnGamesObject actual = facade.listGames("goober");
+        assertTrue((actual.statusCode() == 401) &&
+                (actual.statusMessage().equals("Unauthorized")));
+    }
+
+
+
 
 
 
