@@ -21,15 +21,34 @@ public class ServerFacadeTests {
         facade = new ServerFacade("http://localhost:8080/");
     }
 
+    @BeforeEach
+    public void clear() throws URISyntaxException, IOException {
+        facade.clear();
+    }
+
     @AfterAll
     static void stopServer() {
         server.stop();
     }
 
     @Test
-    public void testLoginSuccess() throws IOException, URISyntaxException {
-        ReturnObject actual = facade.login("test", "test");
+    void testRegisterSuccess() throws Exception {
+        ReturnObject r = facade.register("test", "test", "p1@email.com");
+        String authToken = r.body().get("authToken");
+        assertTrue(authToken.length() > 10);
+    }
 
+    @Test
+    void testRegisterAlreadyTaken() throws Exception {
+        facade.register("test", "test", "p1@email.com");
+        ReturnObject actual = facade.register("test", "test", "p1@email.com");
+        assertTrue(actual.statusCode() == 403);
+    }
+
+    @Test
+    public void testLoginSuccess() throws IOException, URISyntaxException {
+        facade.register("test", "test", "p1@email.com");
+        ReturnObject actual = facade.login("test", "test");
         assertTrue((actual.statusCode() == 200) && (actual.statusMessage().equals("OK") &&
                 (actual.body().containsKey("authToken"))));
 
@@ -42,11 +61,15 @@ public class ServerFacadeTests {
                 (actual.statusMessage().equals("Unauthorized")));
     }
 
+    @Test
+    public void testLogoutSuccess() throws IOException, URISyntaxException {
+        ReturnObject r = facade.register("test", "test", "p1@email.com");
+        String authToken = r.body().get("authToken");
+        ReturnObject actual = facade.logout(authToken);
+        assertTrue(actual.statusCode() == 200);
+    }
 
-//    @Test
-//    void register() throws Exception {
-//        var authData = facade.register("player1", "password", "p1@email.com");
-//        assertTrue(authData.authToken().length() > 10);
-//    }
+
+
 
 }

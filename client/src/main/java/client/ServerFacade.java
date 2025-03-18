@@ -68,5 +68,12 @@ public class ServerFacade {
         return receiveResponse(http);
     }
 
+    public ReturnObject clear() throws URISyntaxException, IOException {
+        String url = serverUrl + "db";
+        String method = "DELETE";
+        HttpURLConnection http = sendRequest(null, url, method, "");
+        return receiveResponse(http);
+    }
+
 }
 
