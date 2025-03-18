@@ -25,7 +25,7 @@ public class PostLogin {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "create" -> create(params);
+                case "create" -> create(authToken, server, params);
                 case "list" -> list(server, authToken);
                 case "join" -> join(params);
                 case "observe" -> observe(params);
@@ -122,13 +122,18 @@ public class PostLogin {
         throw new Exception("Expected: <id>\n");
     }
 
-    public static String create(String... params) throws Exception {
-        if (params.length >= 1) {
-            var name = params[0];
-            // create the game
-            return String.format("Your game, %s, has been created\n", name);
+    public static String create(String authToken, ServerFacade server, String... params) {
+        try {
+            ReturnObject r = server.create(authToken, params[0]);
+            return switch (r.statusCode()) {
+                case 200 -> String.format("Your game, %s, has been created.\n", params[0]);
+                case 400 -> "Error: bad input. Expected: <gameName>. Try again.\n";
+                case 401 -> "You are unauthorized to do this. Please try again.\n";
+                default -> "Server Error: " + r.statusMessage() + "\n";
+            };
+        } catch (Exception e) {
+            return e.getMessage();
         }
-        throw new Exception("Expected: <game name>\n");
     }
 
     public static String help() {

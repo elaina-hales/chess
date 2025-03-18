@@ -112,5 +112,13 @@ public class ServerFacade {
         return receiveResponseGames(http);
     }
 
+    public ReturnObject create(String authToken, String gameName) throws IOException, URISyntaxException {
+        String url = serverUrl + "game";
+        String method = "POST";
+        var body = Map.of("gameName", gameName);
+        var jsonBody = new Gson().toJson(body);
+        HttpURLConnection http = sendRequest(authToken, url, method, jsonBody);
+        return receiveResponse(http);
+    }
 }
 
