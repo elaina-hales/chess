@@ -23,6 +23,7 @@ public class ServerFacade {
         var body = Map.of("username", username, "password", password);
         var jsonBody = new Gson().toJson(body);
         HttpURLConnection http = sendRequest(null, url, method, jsonBody);
+
         return receiveResponse(http);
     }
 
