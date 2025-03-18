@@ -1,6 +1,7 @@
 package menus;
 
 import chess.ChessGame;
+import client.ReturnGamesObject;
 import client.ReturnObject;
 import client.ServerFacade;
 import consoleRepl.GameState;
@@ -25,7 +26,7 @@ public class PostLogin {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "create" -> create(params);
-                case "list" -> list();
+                case "list" -> list(server, authToken);
                 case "join" -> join(params);
                 case "observe" -> observe(params);
                 case "logout" -> logout(server, authToken);
@@ -54,22 +55,20 @@ public class PostLogin {
         }
     }
 
-    public static String list() {
-        // get an array of games
-        Collection<GameData> games = new ArrayList<>();
+    private static String listHelper(Collection<GameData> body){
         StringBuilder result = new StringBuilder();
         int index = 1;
-        for (GameData game: games) {
+        for (GameData game: body) {
             gamesAndTmpIDs.put(index, game.gameName());
             result.append(index).append(". ");
             result.append(game.gameName()).append("\n\tWhite player: ");
-            if (game.whiteUsername() != null){
+            if (game.whiteUsername() != null) {
                 result.append(game.whiteUsername());
             } else {
                 result.append("Available");
             }
             result.append("\n\tBlack player: ");
-            if (game.blackUsername() != null){
+            if (game.blackUsername() != null) {
                 result.append(game.blackUsername());
             } else {
                 result.append("Available");
@@ -78,6 +77,19 @@ public class PostLogin {
             index += 1;
         }
         return result.toString();
+    }
+
+    public static String list(ServerFacade server, String authToken) {
+        try {
+            ReturnGamesObject r = server.listGames(authToken);
+            return switch (r.statusCode()) {
+                case 200 -> listHelper(r.body().get("games"));
+                case 401 -> "You are unauthorized to do this. Please try again.\n";
+                default -> "Server Error: " + r.statusMessage() + "\n";
+            };
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     public static String join(String... params) throws Exception {

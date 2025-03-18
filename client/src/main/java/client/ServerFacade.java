@@ -1,10 +1,12 @@
 package client;
 import com.google.gson.Gson;
+import model.GameData;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.util.Collection;
 import java.util.Map;
 
 
@@ -40,14 +42,34 @@ public class ServerFacade {
         var statusCode = http.getResponseCode();
         var statusMessage = http.getResponseMessage();
         Map<String, String> responseBody = readResponseBody(statusCode, http);
-
         ReturnObject r = new ReturnObject(statusCode, statusMessage, responseBody);
+        return r;
+    }
+
+    private static ReturnGamesObject receiveResponseGames(HttpURLConnection http) throws IOException {
+        var statusCode = http.getResponseCode();
+        var statusMessage = http.getResponseMessage();
+        Map<String, Collection<GameData>> responseBody = readRespListGames(statusCode, http);
+        ReturnGamesObject r = new ReturnGamesObject(statusCode, statusMessage, responseBody);
         return r;
     }
 
     private static Map<String, String> readResponseBody(int statusCode, HttpURLConnection http) throws IOException {
         if (statusCode == 200){
             Map<String, String> responseBody;
+            try (InputStream respBody = http.getInputStream()) {
+                InputStreamReader inputStreamReader = new InputStreamReader(respBody);
+                responseBody = new Gson().fromJson(inputStreamReader, Map.class);
+            }
+            return responseBody;
+        } else {
+            return null;
+        }
+    }
+
+    private static Map<String, Collection<GameData>> readRespListGames(int statusCode, HttpURLConnection http) throws IOException {
+        if (statusCode == 200){
+            Map<String, Collection<GameData>> responseBody;
             try (InputStream respBody = http.getInputStream()) {
                 InputStreamReader inputStreamReader = new InputStreamReader(respBody);
                 responseBody = new Gson().fromJson(inputStreamReader, Map.class);
@@ -82,4 +104,13 @@ public class ServerFacade {
         HttpURLConnection http = sendRequest(authToken, url, method, "");
         return receiveResponse(http);
     }
+
+    public ReturnGamesObject listGames(String authToken) throws IOException, URISyntaxException {
+        String url = serverUrl + "game";
+        String method = "GET";
+        HttpURLConnection http = sendRequest(authToken, url, method, "");
+        return receiveResponseGames(http);
+    }
+
 }
+
