@@ -7,8 +7,10 @@ import menus.PreLogin;
 
 import java.util.Scanner;
 
-import static repl.State.*;
-import static repl.GameState.*;
+import static repl.GameState.JOINED_GAME;
+import static repl.GameState.NOT_JOINED;
+import static repl.State.LOGGED_IN;
+import static repl.State.LOGGED_OUT;
 
 
 public class Repl {

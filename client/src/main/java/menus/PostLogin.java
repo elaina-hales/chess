@@ -4,13 +4,14 @@ import chess.ChessGame;
 import client.ReturnGamesObject;
 import client.ReturnObject;
 import client.ServerFacade;
+import model.GameData;
 import repl.GameState;
 import repl.State;
-import model.GameData;
 import requestsresults.GamesResult;
 import ui.DrawChessBoard;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class PostLogin {
     public static State state = State.LOGGED_IN;

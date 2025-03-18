@@ -1,12 +1,13 @@
 package client;
+
 import com.google.gson.Gson;
-import requestsresults.GamesResult;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.util.Map;
+
+import static client.httpCommunicator.*;
 
 
 public class ServerFacade {
@@ -14,69 +15,6 @@ public class ServerFacade {
 
     public ServerFacade(String url) {
         this.serverUrl = url;
-    }
-
-    private static HttpURLConnection sendRequest(String authToken, String url, String method, String body) throws URISyntaxException, IOException {
-        URI uri = new URI(url);
-        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
-        http.setRequestMethod(method);
-        if (authToken != null){
-            http.addRequestProperty("authorization", authToken);
-        }
-        writeRequestBody(body, http);
-        http.connect();
-        return http;
-    }
-
-    private static void writeRequestBody(String body, HttpURLConnection http) throws IOException {
-        if (!body.isEmpty()) {
-            http.setDoOutput(true);
-            try (var outputStream = http.getOutputStream()) {
-                outputStream.write(body.getBytes());
-            }
-        }
-    }
-
-    private static ReturnObject receiveResponse(HttpURLConnection http) throws IOException {
-        var statusCode = http.getResponseCode();
-        var statusMessage = http.getResponseMessage();
-        Map<String, String> responseBody = readResponseBody(statusCode, http);
-        ReturnObject r = new ReturnObject(statusCode, statusMessage, responseBody);
-        return r;
-    }
-
-    private static ReturnGamesObject receiveResponseGames(HttpURLConnection http) throws IOException {
-        var statusCode = http.getResponseCode();
-        var statusMessage = http.getResponseMessage();
-        GamesResult responseBody = readRespListGames(statusCode, http);
-        ReturnGamesObject r = new ReturnGamesObject(statusCode, statusMessage, responseBody);
-        return r;
-    }
-
-    private static Map<String, String> readResponseBody(int statusCode, HttpURLConnection http) throws IOException {
-        if (statusCode == 200){
-            Map<String, String> responseBody;
-            try (InputStream respBody = http.getInputStream()) {
-                InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-                responseBody = new Gson().fromJson(inputStreamReader, Map.class);
-            }
-            return responseBody;
-        } else {
-            return null;
-        }
-    }
-
-    private static GamesResult readRespListGames(int statusCode, HttpURLConnection http) throws IOException {
-        if (statusCode == 200){
-            GamesResult responseBody;
-            try (InputStream respBody = http.getInputStream()) {
-                InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-                responseBody = new Gson().fromJson(inputStreamReader, GamesResult.class);
-            }
-            return responseBody;
-        } else {
-            return null;
-        }
     }
 
     public ReturnObject login(String username, String password) throws IOException, URISyntaxException {
