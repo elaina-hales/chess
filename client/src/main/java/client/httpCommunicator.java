@@ -1,7 +1,6 @@
 package client;
 
 import com.google.gson.Gson;
-import requestsresults.GamesResult;
 
 import java.io.IOException;
 import java.io.InputStream;

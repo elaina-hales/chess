@@ -7,7 +7,6 @@ import client.ServerFacade;
 import model.GameData;
 import repl.GameState;
 import repl.State;
-import requestsresults.GamesResult;
 import ui.DrawChessBoard;
 
 import java.util.Arrays;
