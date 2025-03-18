@@ -15,21 +15,21 @@ public class ServerFacade {
         this.serverUrl = url;
     }
 
-    private static HttpURLConnection sendRequest(String authtoken, String url, String method, String body) throws URISyntaxException, IOException {
+    private static HttpURLConnection sendRequest(String authToken, String url, String method, String body) throws URISyntaxException, IOException {
         URI uri = new URI(url);
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod(method);
-        writeRequestBody(authtoken, body, http);
+        if (authToken != null){
+            http.addRequestProperty("authorization", authToken);
+        }
+        writeRequestBody(body, http);
         http.connect();
         return http;
     }
 
-    private static void writeRequestBody(String authToken, String body, HttpURLConnection http) throws IOException {
+    private static void writeRequestBody(String body, HttpURLConnection http) throws IOException {
         if (!body.isEmpty()) {
             http.setDoOutput(true);
-            if (authToken != null){
-                http.addRequestProperty("authorization", authToken);
-            }
             try (var outputStream = http.getOutputStream()) {
                 outputStream.write(body.getBytes());
             }
@@ -77,8 +77,8 @@ public class ServerFacade {
     }
 
     public ReturnObject logout(String authToken) throws IOException, URISyntaxException {
-        String url = serverUrl + "user";
-        String method = "POST";
+        String url = serverUrl + "session";
+        String method = "DELETE";
         HttpURLConnection http = sendRequest(authToken, url, method, "");
         return receiveResponse(http);
     }
