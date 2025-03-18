@@ -1,6 +1,7 @@
 package client;
 import com.google.gson.Gson;
 import model.GameData;
+import requestsresults.GamesResult;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +50,7 @@ public class ServerFacade {
     private static ReturnGamesObject receiveResponseGames(HttpURLConnection http) throws IOException {
         var statusCode = http.getResponseCode();
         var statusMessage = http.getResponseMessage();
-        Map<String, Collection<GameData>> responseBody = readRespListGames(statusCode, http);
+        GamesResult responseBody = readRespListGames(statusCode, http);
         ReturnGamesObject r = new ReturnGamesObject(statusCode, statusMessage, responseBody);
         return r;
     }
@@ -67,12 +68,12 @@ public class ServerFacade {
         }
     }
 
-    private static Map<String, Collection<GameData>> readRespListGames(int statusCode, HttpURLConnection http) throws IOException {
+    private static GamesResult readRespListGames(int statusCode, HttpURLConnection http) throws IOException {
         if (statusCode == 200){
-            Map<String, Collection<GameData>> responseBody;
+            GamesResult responseBody;
             try (InputStream respBody = http.getInputStream()) {
                 InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-                responseBody = new Gson().fromJson(inputStreamReader, Map.class);
+                responseBody = new Gson().fromJson(inputStreamReader, GamesResult.class);
             }
             return responseBody;
         } else {

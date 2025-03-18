@@ -7,6 +7,7 @@ import client.ServerFacade;
 import consoleRepl.GameState;
 import consoleRepl.State;
 import model.GameData;
+import requestsresults.GamesResult;
 import ui.DrawChessBoard;
 
 import java.util.*;
@@ -55,10 +56,10 @@ public class PostLogin {
         }
     }
 
-    private static String listHelper(Collection<GameData> body){
+    private static String listHelper(GamesResult body){
         StringBuilder result = new StringBuilder();
         int index = 1;
-        for (GameData game: body) {
+        for (GameData game: body.games()) {
             gamesAndTmpIDs.put(index, game.gameName());
             result.append(index).append(". ");
             result.append(game.gameName()).append("\n\tWhite player: ");
@@ -83,7 +84,7 @@ public class PostLogin {
         try {
             ReturnGamesObject r = server.listGames(authToken);
             return switch (r.statusCode()) {
-                case 200 -> listHelper(r.body().get("games"));
+                case 200 -> listHelper(r.body());
                 case 401 -> "You are unauthorized to do this. Please try again.\n";
                 default -> "Server Error: " + r.statusMessage() + "\n";
             };

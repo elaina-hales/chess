@@ -1,9 +1,6 @@
 package client;
 
-import model.GameData;
+import requestsresults.GamesResult;
 
-import java.util.Collection;
-import java.util.Map;
-
-public record ReturnGamesObject(int statusCode, String statusMessage, Map<String, Collection<GameData>> body) {
+public record ReturnGamesObject(int statusCode, String statusMessage, GamesResult body) {
 }
