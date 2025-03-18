@@ -1,6 +1,7 @@
 package menus;
 
 import chess.ChessGame;
+import client.GamesResult;
 import client.ReturnGamesObject;
 import client.ReturnObject;
 import client.ServerFacade;
