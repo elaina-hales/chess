@@ -1,13 +1,11 @@
 package client;
 import com.google.gson.Gson;
-import model.GameData;
 import requestsresults.GamesResult;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
-import java.util.Collection;
 import java.util.Map;
 
 
@@ -121,5 +119,15 @@ public class ServerFacade {
         HttpURLConnection http = sendRequest(authToken, url, method, jsonBody);
         return receiveResponse(http);
     }
+
+    public ReturnObject join(String authToken, int gameID, String color) throws IOException, URISyntaxException {
+        String url = serverUrl + "game";
+        String method = "PUT";
+        var body = Map.of("playerColor", color.toUpperCase(), "gameID", gameID);
+        var jsonBody = new Gson().toJson(body);
+        HttpURLConnection http = sendRequest(authToken, url, method, jsonBody);
+        return receiveResponse(http);
+    }
+
 }
 

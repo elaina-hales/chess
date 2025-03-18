@@ -15,7 +15,7 @@ import java.util.*;
 public class PostLogin {
     public static State state = State.LOGGED_IN;
     public static GameState joined = GameState.NOT_JOINED;
-    static HashMap<Integer, String> gamesAndTmpIDs = new HashMap<>();
+    private static HashMap<Integer, Integer> gameIDsAndTmpIDs = new HashMap<>();
 
     public PostLogin() {
     }
@@ -28,7 +28,7 @@ public class PostLogin {
             return switch (cmd) {
                 case "create" -> create(authToken, server, params);
                 case "list" -> list(server, authToken);
-                case "join" -> join(params);
+                case "join" -> join(server, authToken, params);
                 case "observe" -> observe(params);
                 case "logout" -> logout(server, authToken);
                 case "quit" -> "quit";
@@ -60,7 +60,7 @@ public class PostLogin {
         StringBuilder result = new StringBuilder();
         int index = 1;
         for (GameData game: body.games()) {
-            gamesAndTmpIDs.put(index, game.gameName());
+            gameIDsAndTmpIDs.put(index, game.gameID());
             result.append(index).append(". ");
             result.append(game.gameName()).append("\n\tWhite player: ");
             if (game.whiteUsername() != null) {
@@ -93,28 +93,47 @@ public class PostLogin {
         }
     }
 
-    public static String join(String... params) throws Exception {
+    public static String join(ServerFacade server, String authToken, String... params) {
         if (params.length >= 2) {
-            var id = params[0];
-            var player = params[1];
-            if ((player.equals("WHITE")) || (player.equals("BLACK"))) {
-                ChessGame chess = new ChessGame();
-                joined = GameState.JOINED_GAME;
-                GameMenu.joined = GameState.JOINED_GAME;
-                // try to join game and catch errors otherwise join and show the board
-                DrawChessBoard d = new DrawChessBoard();
-                d.draw(chess, player);
-                return help();
+            try {
+                int id = Integer.parseInt(params[0]);
+                var player = params[1];
+                int statusCode;
+                ReturnObject r = null;
+                if (gameIDsAndTmpIDs.isEmpty()){
+                    statusCode = 800;
+                } else {
+                    r = server.join(authToken, gameIDsAndTmpIDs.get(id), player);
+                    statusCode = r.statusCode();
+                }
+                return switch (statusCode) {
+                    case 200 -> successJoin(player);
+                    case 400 -> "Error: bad request. Expected: <id> <WHITE|BLACK>. Please try again.\n";
+                    case 401 -> "You are unauthorized to do this. Please try again.\n";
+                    case 403 -> "That color is already taken. Select a different color or game and try again.\n";
+                    case 800 -> "You must list available games before joining one. Enter 'list' to list available games.\n";
+                    default -> "Server Error: " + r.statusMessage() + "\n";
+                };
+            } catch (Exception e) {
+                return e.getMessage();
             }
+        } else {
+            return "Error: bad request. Expected: <id> <WHITE|BLACK>. Please try again.\n";
         }
-        throw new Exception("Expected: <id> <WHITE|BLACK>\n");
+    }
+
+    public static String successJoin(String player){
+        joined = GameState.JOINED_GAME;
+        GameMenu.joined = GameState.JOINED_GAME;
+        DrawChessBoard d = new DrawChessBoard();
+        d.draw(new ChessGame(), player);
+        return GameMenu.help();
     }
 
     public static String observe(String... params) throws Exception {
         if (params.length >= 1) {
             var id = params[0];
-            String gameName = gamesAndTmpIDs.get(id);
-            // get the requested chess game and display it
+            int gameID = gameIDsAndTmpIDs.get(id);
             ChessGame chess = new ChessGame();
             DrawChessBoard d = new DrawChessBoard();
             d.draw(chess, "white");
