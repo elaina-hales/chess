@@ -75,6 +75,9 @@ public class PostLogin {
             result.append("\n");
             index += 1;
         }
+        if (result.isEmpty()){
+            result.append("No games have been created.\n");
+        }
         return result.toString();
     }
 
@@ -100,16 +103,19 @@ public class PostLogin {
                 ReturnObject r = null;
                 if (gameIDsAndTmpIDs.isEmpty()){
                     statusCode = 800;
+                } else if (id > gameIDsAndTmpIDs.size()) {
+                    statusCode = 900;
                 } else {
                     r = server.join(authToken, gameIDsAndTmpIDs.get(id), player);
                     statusCode = r.statusCode();
                 }
                 return switch (statusCode) {
                     case 200 -> successJoin(player);
-                    case 400 -> "Error: bad request. Expected: <id> <WHITE|BLACK>. Please try again.\n";
+                    case 400 -> "Error: bad input. Expected: <id> <WHITE|BLACK>. Please try again.\n";
                     case 401 -> "You are unauthorized to do this. Please try again.\n";
                     case 403 -> "That color is already taken. Select a different color or game and try again.\n";
                     case 800 -> "You must list available games before joining one. Enter 'list' to list available games.\n";
+                    case 900 -> "That index is not in this list. Try again.\n";
                     default -> "Server Error: " + r.statusMessage() + "\n";
                 };
             } catch (Exception e) {
@@ -131,26 +137,29 @@ public class PostLogin {
     public static String observe(String... params) throws Exception {
         if (params.length >= 1) {
             var id = params[0];
-            int gameID = gameIDsAndTmpIDs.get(id);
             ChessGame chess = new ChessGame();
             DrawChessBoard d = new DrawChessBoard();
             d.draw(chess, "white");
             return "";
         }
-        throw new Exception("Expected: <id>\n");
+        throw new Exception("Error: bad input. Expected: <id>\n");
     }
 
     public static String create(String authToken, ServerFacade server, String... params) {
-        try {
-            ReturnCreateObject r = server.create(authToken, params[0]);
-            return switch (r.statusCode()) {
-                case 200 -> String.format("Your game, %s, has been created.\n", params[0]);
-                case 400 -> "Error: bad input. Expected: <gameName>. Try again.\n";
-                case 401 -> "You are unauthorized to do this. Please try again.\n";
-                default -> "Server Error: " + r.statusMessage() + "\n";
-            };
-        } catch (Exception e) {
-            return e.getMessage();
+        if (params.length >= 1) {
+            try {
+                ReturnCreateObject r = server.create(authToken, params[0]);
+                return switch (r.statusCode()) {
+                    case 200 -> String.format("Your game, %s, has been created.\n", params[0]);
+                    case 400 -> "Error: bad input. Expected: <gameName>. Try again.\n";
+                    case 401 -> "You are unauthorized to do this. Please try again.\n";
+                    default -> "Server Error: " + r.statusMessage() + "\n";
+                };
+            } catch (Exception e) {
+                return e.getMessage();
+            }
+        } else {
+            return "Error: bad input. Expected: <gameName>. Try again.\n";
         }
     }
 
