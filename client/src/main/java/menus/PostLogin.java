@@ -9,6 +9,7 @@ import ui.DrawChessBoard;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public class PostLogin {
     public static State state = State.LOGGED_IN;
@@ -97,17 +98,21 @@ public class PostLogin {
     public static String join(ServerFacade server, String authToken, String... params) {
         if (params.length >= 2) {
             try {
-                int id = Integer.parseInt(params[0]);
                 var player = params[1];
                 int statusCode;
                 ReturnObject r = null;
-                if (gameIDsAndTmpIDs.isEmpty()){
-                    statusCode = 800;
-                } else if (id > gameIDsAndTmpIDs.size()) {
-                    statusCode = 900;
+                if (Pattern.matches("[a-zA-Za-z]*", params[0])){
+                    statusCode = 400;
                 } else {
-                    r = server.join(authToken, gameIDsAndTmpIDs.get(id), player);
-                    statusCode = r.statusCode();
+                    int id = Integer.parseInt(params[0]);
+                    if (gameIDsAndTmpIDs.isEmpty()){
+                        statusCode = 800;
+                    } else if (id > gameIDsAndTmpIDs.size()) {
+                        statusCode = 900;
+                    } else {
+                        r = server.join(authToken, gameIDsAndTmpIDs.get(id), player);
+                        statusCode = r.statusCode();
+                    }
                 }
                 return switch (statusCode) {
                     case 200 -> successJoin(player);
