@@ -46,6 +46,13 @@ public class HttpCommunicator {
         return new ReturnGamesObject(statusCode, statusMessage, responseBody);
     }
 
+    public static ReturnCreateObject receiveResponseCreate(HttpURLConnection http) throws IOException {
+        var statusCode = http.getResponseCode();
+        var statusMessage = http.getResponseMessage();
+        CreateResult responseBody = readResponseCreate(statusCode, http);
+        return new ReturnCreateObject(statusCode, statusMessage, responseBody);
+    }
+
     public static Map<String, String> readResponseBody(int statusCode, HttpURLConnection http) throws IOException {
         if (statusCode == 200){
             Map<String, String> responseBody;
@@ -71,4 +78,18 @@ public class HttpCommunicator {
             return null;
         }
     }
+
+    public static CreateResult readResponseCreate(int statusCode, HttpURLConnection http) throws IOException {
+        if (statusCode == 200){
+            CreateResult responseBody;
+            try (InputStream respBody = http.getInputStream()) {
+                InputStreamReader inputStreamReader = new InputStreamReader(respBody);
+                responseBody = new Gson().fromJson(inputStreamReader, CreateResult.class);
+            }
+            return responseBody;
+        } else {
+            return null;
+        }
+    }
+
 }

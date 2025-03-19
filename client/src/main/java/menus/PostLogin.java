@@ -1,10 +1,7 @@
 package menus;
 
 import chess.ChessGame;
-import client.GamesResult;
-import client.ReturnGamesObject;
-import client.ReturnObject;
-import client.ServerFacade;
+import client.*;
 import model.GameData;
 import repl.GameState;
 import repl.State;
@@ -145,7 +142,7 @@ public class PostLogin {
 
     public static String create(String authToken, ServerFacade server, String... params) {
         try {
-            ReturnObject r = server.create(authToken, params[0]);
+            ReturnCreateObject r = server.create(authToken, params[0]);
             return switch (r.statusCode()) {
                 case 200 -> String.format("Your game, %s, has been created.\n", params[0]);
                 case 400 -> "Error: bad input. Expected: <gameName>. Try again.\n";

@@ -50,13 +50,13 @@ public class ServerFacade {
         return receiveResponseGames(http);
     }
 
-    public ReturnObject create(String authToken, String gameName) throws IOException, URISyntaxException {
+    public ReturnCreateObject create(String authToken, String gameName) throws IOException, URISyntaxException {
         String url = serverUrl + "game";
         String method = "POST";
         var body = Map.of("gameName", gameName);
         var jsonBody = new Gson().toJson(body);
         HttpURLConnection http = sendRequest(authToken, url, method, jsonBody);
-        return receiveResponse(http);
+        return receiveResponseCreate(http);
     }
 
     public ReturnObject join(String authToken, int gameID, String color) throws IOException, URISyntaxException {
@@ -68,11 +68,11 @@ public class ServerFacade {
         return receiveResponse(http);
     }
 
-    public ReturnObject clear() throws URISyntaxException, IOException {
+    public void clear() throws URISyntaxException, IOException {
         String url = serverUrl + "db";
         String method = "DELETE";
         HttpURLConnection http = sendRequest(null, url, method, "");
-        return receiveResponse(http);
+        receiveResponse(http);
     }
 
 }

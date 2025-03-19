@@ -6,6 +6,7 @@ import server.Server;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ServerFacadeTests {
@@ -33,8 +34,8 @@ public class ServerFacadeTests {
 
     @Test
     void testRegisterSuccess() throws Exception {
-        ReturnObject r = facade.register("test", "test", "p1@email.com");
-        String authToken = r.body().get("authToken");
+        ReturnObject register = facade.register("test", "test", "p1@email.com");
+        String authToken = register.body().get("authToken");
         assertTrue(authToken.length() > 10);
     }
 
@@ -42,7 +43,7 @@ public class ServerFacadeTests {
     void testRegisterAlreadyTaken() throws Exception {
         facade.register("test", "test", "p1@email.com");
         ReturnObject actual = facade.register("test", "test", "p1@email.com");
-        assertTrue(actual.statusCode() == 403);
+        assertEquals(403, actual.statusCode());
     }
 
     @Test
@@ -63,10 +64,10 @@ public class ServerFacadeTests {
 
     @Test
     public void testLogoutSuccess() throws IOException, URISyntaxException {
-        ReturnObject r = facade.register("test", "test", "p1@email.com");
-        String authToken = r.body().get("authToken");
+        ReturnObject register = facade.register("test", "test", "p1@email.com");
+        String authToken = register.body().get("authToken");
         ReturnObject actual = facade.logout(authToken);
-        assertTrue(actual.statusCode() == 200);
+        assertEquals(200, actual.statusCode());
     }
 
     @Test
@@ -79,10 +80,10 @@ public class ServerFacadeTests {
 
     @Test
     public void testListSuccess() throws IOException, URISyntaxException {
-        ReturnObject r = facade.register("test", "test", "p1@email.com");
-        String authToken = r.body().get("authToken");
+        ReturnObject register = facade.register("test", "test", "p1@email.com");
+        String authToken = register.body().get("authToken");
         ReturnGamesObject actual = facade.listGames(authToken);
-        assertTrue(actual.statusCode() == 200);
+        assertEquals(200, actual.statusCode());
     }
 
     @Test
@@ -95,22 +96,41 @@ public class ServerFacadeTests {
 
     @Test
     public void testCreateGameSuccess() throws IOException, URISyntaxException {
-        ReturnObject r = facade.register("test", "test", "p1@email.com");
-        String authToken = r.body().get("authToken");
-        ReturnObject actual = facade.create(authToken, "testGame");
-        assertTrue(actual.statusCode() == 200);
+        ReturnObject register = facade.register("test", "test", "p1@email.com");
+        String authToken = register.body().get("authToken");
+        ReturnCreateObject actual = facade.create(authToken, "testGame");
+        assertEquals(200, actual.statusCode());
     }
 
     @Test
     public void testCreateGameUnauthorized() throws IOException, URISyntaxException {
         facade.register("test", "test", "p1@email.com");
-        ReturnObject actual = facade.create("popopopop", "testGame");
-        assertTrue(actual.statusCode() == 401);
+        ReturnCreateObject actual = facade.create("popopopop", "testGame");
+        assertEquals(401, actual.statusCode());
     }
 
+    @Test
+    public void testJoinGameSuccess() throws IOException, URISyntaxException {
+        ReturnObject register = facade.register("test", "test", "p1@email.com");
+        String authToken = register.body().get("authToken");
+        ReturnCreateObject create = facade.create(authToken, "test");
+        int gameID = create.body().gameID();
+        ReturnObject join = facade.join(authToken, gameID, "WHITE");
+        assertEquals(200, join.statusCode());
+    }
 
+    @Test
+    public void testJoinGameAlreadyTaken() throws IOException, URISyntaxException {
+        ReturnObject register = facade.register("test", "test", "p1@email.com");
+        String authToken = register.body().get("authToken");
+        ReturnCreateObject create = facade.create(authToken, "test");
+        int gameID = create.body().gameID();
+        facade.join(authToken, gameID, "WHITE");
+        facade.logout(authToken);
 
-
-
-
+        ReturnObject registerNew = facade.register("test1", "test1", "p2@email.com");
+        String newAuthToken = registerNew.body().get("authToken");
+        ReturnObject j = facade.join(newAuthToken, gameID, "WHITE");
+        assertEquals(403, j.statusCode());
+    }
 }
