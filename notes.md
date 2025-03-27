@@ -58,3 +58,20 @@ Other:
   - there are unicode chess characters
   - try to not hardcode the rows, check and see if a piece needs to be rendered there
   - client should not know how to draw the board
+
+### Phase 6:
+- you are adding notifications this time
+- User Game commands (from client)
+  - connect -- connect to the game as a player or observer
+  - make_move -- player move
+  - leave -- abandon game
+  - resign -- admit defeat
+- WS communicator receives messages and displays notifications 
+- see the slides for the websocket request handler class
+- work on make move last 
+- ServerMessage (from Server)
+  - load_game
+  - notification
+  - error
+- see code online for details ^
+- this is a longer phase -- takes the most time
