@@ -17,6 +17,7 @@ public class Repl {
     private State state = LOGGED_OUT;
     private GameState joined = NOT_JOINED;
     private String authToken = null;
+    private String username = null;
 
     public void run(ServerFacade server) {
         System.out.println("Welcome to chess! Sign in to start.");
@@ -31,7 +32,7 @@ public class Repl {
                 if (state == LOGGED_IN) {
                     authToken = PreLogin.getToken();
                     if (joined == JOINED_GAME){
-                        result = GameMenu.eval(line, server);
+                        result = GameMenu.eval(line, server, username);
                         System.out.print(result);
                         joined = GameMenu.joined;
                     } else {
@@ -46,6 +47,9 @@ public class Repl {
                     System.out.print(result);
                     state = PreLogin.state;
                     PostLogin.state = state;
+                    if (state == LOGGED_IN){
+                        this.username = PreLogin.getUsername();
+                    }
                 }
                 if (result.equals("quit")){
                     break;

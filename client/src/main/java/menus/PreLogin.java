@@ -70,7 +70,9 @@ public class PreLogin {
         }
         throw new Exception("Expected: <username> <password> <email> \n");
     }
-
+    public static String getUsername(){
+        return username;
+    }
     public static String getToken(){
         return authToken;
     }

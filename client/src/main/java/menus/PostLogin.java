@@ -134,6 +134,7 @@ public class PostLogin {
     public static String successJoin(String player){
         joined = GameState.JOINED_GAME;
         GameMenu.joined = GameState.JOINED_GAME;
+        GameMenu.color = player;
         DrawChessBoard d = new DrawChessBoard();
         d.draw(new ChessGame(), player);
         return GameMenu.help();
