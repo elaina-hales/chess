@@ -136,7 +136,7 @@ public class PostLogin {
         GameMenu.joined = GameState.JOINED_GAME;
         GameMenu.color = player;
         DrawChessBoard d = new DrawChessBoard();
-        d.draw(new ChessGame(), player);
+        d.draw(new ChessGame(), player, false);
         return GameMenu.help();
     }
 
@@ -145,7 +145,7 @@ public class PostLogin {
             var id = params[0];
             ChessGame chess = new ChessGame();
             DrawChessBoard d = new DrawChessBoard();
-            d.draw(chess, "white");
+            d.draw(chess, "white", false);
             return "";
         }
         throw new Exception("Error: bad input. Expected: <id>\n");

@@ -1,20 +1,30 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static ui.EscapeSequences.*;
 
 public class DrawChessBoard {
+    private final Collection<ChessPosition> endPositions = new ArrayList<>();
+
     public DrawChessBoard(){
     }
 
-    public void draw(ChessGame chess, String perspective){
+    public void highlight(ChessGame chess, String perspective, ChessPosition startPosition){
+        Collection<ChessMove> moves = chess.validMoves(startPosition);
+        for (ChessMove move: moves){
+            ChessPosition pos = move.getEndPosition();
+            endPositions.add(pos);
+        }
+        draw(chess, perspective, true);
+    }
+
+    public void draw(ChessGame chess, String perspective, boolean isHighlight){
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
 
@@ -24,11 +34,11 @@ public class DrawChessBoard {
         if (perspective.equals("white")){
             header = "    a  b  c  d  e  f  g  h \n";
             out.print(header);
-            drawWhite(out, board);
+            drawWhite(out, board, isHighlight);
         } else {
             header = "    h  g  f  e  d  c  b  a \n";
             out.print(header);
-            drawBlack(out, board);
+            drawBlack(out, board, isHighlight);
         }
         out.print(header);
         out.print(RESET_TEXT_COLOR);
@@ -37,7 +47,7 @@ public class DrawChessBoard {
     }
 
 
-    public void drawWhite(PrintStream out, ChessBoard board){
+    public void drawWhite(PrintStream out, ChessBoard board, boolean isHighlight){
         int row;
         int column;
         for (int i = 1; i < 9; i++){
@@ -47,7 +57,11 @@ public class DrawChessBoard {
             out.print(" ");
             for (int j = 1; j < 9; j++){
                 column = j;
-                drawRow(out, board, row, column, i, j);
+                if (isHighlight){
+                    drawRowHighlight(out, board, row, column, i, j);
+                } else {
+                    drawRow(out, board, row, column, i, j);
+                }
             }
             out.print(SET_BG_COLOR_DARK_GREY);
             out.print(" ");
@@ -57,7 +71,7 @@ public class DrawChessBoard {
     }
 
 
-    public void drawBlack(PrintStream out, ChessBoard board){
+    public void drawBlack(PrintStream out, ChessBoard board, boolean isHighlight){
         int row;
         int column;
         for (int i = 1; i < 9; i++){
@@ -67,7 +81,11 @@ public class DrawChessBoard {
             out.print(" ");
             for (int j = 1; j < 9; j++){
                 column = 9 - j;
-                drawRow(out, board, row, column, i, j);
+                if (isHighlight){
+                    drawRowHighlight(out, board, row, column, i, j);
+                } else {
+                    drawRow(out, board, row, column, i, j);
+                }
             }
             out.print(SET_BG_COLOR_DARK_GREY);
             out.print(" ");
@@ -86,6 +104,26 @@ public class DrawChessBoard {
         out.print(SET_TEXT_COLOR_WHITE);
         ChessPosition np = new ChessPosition(row, column);
         ChessPiece current = board.getPiece(np);
+        writeSquare(out, current);
+    }
+
+    private void drawRowHighlight(PrintStream out, ChessBoard board, int row, int column, int i, int j) {
+        out.print(SET_TEXT_BOLD);
+        ChessPosition np = new ChessPosition(row, column);
+        ChessPiece current = board.getPiece(np);
+        if (endPositions.contains(np)) {
+            out.print(SET_TEXT_COLOR_DARK_GREY);
+            if ((j + i) % 2 != 0){
+                out.print(SET_BG_COLOR_LIGHT_GREEN);
+            } else {
+                out.print(SET_BG_COLOR_DARK_GREEN);
+            }
+        }
+        out.print(SET_TEXT_COLOR_WHITE);
+        writeSquare(out, current);
+    }
+
+    private void writeSquare(PrintStream out, ChessPiece current) {
         String piece = "   ";
         if (current != null) {
             String color = switch (current.getTeamColor()) {

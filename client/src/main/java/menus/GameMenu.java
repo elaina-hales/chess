@@ -6,6 +6,7 @@ import repl.GameState;
 import ui.DrawChessBoard;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class GameMenu {
     public static GameState joined = GameState.JOINED_GAME;
@@ -26,7 +27,7 @@ public class GameMenu {
                 case "leave" -> leave();
                 case "move" -> null;
                 case "resign" -> null;
-                case "highlight" -> null;
+                case "highlight" -> highlight(params[0]);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -43,7 +44,16 @@ public class GameMenu {
 
     public static String redraw() {
         DrawChessBoard d = new DrawChessBoard();
-        d.draw(new ChessGame(), color);
+        d.draw(new ChessGame(), color, false);
+        return "";
+    }
+
+    public static String highlight(String input) {
+        if (!Pattern.matches("[a-h][1-8]", input)) {
+            return "Invalid input. Input must be a lowercase letter (a-h) followed by a number (1-8).";
+        }
+        DrawChessBoard d = new DrawChessBoard();
+//        d.highlight(new ChessGame(), color, );
         return "";
     }
 
@@ -53,7 +63,7 @@ public class GameMenu {
                     leave - the game
                     move <start> <end> - make a move
                     resign - forfeit and leave the game
-                    highlight <piece> - highlight possible moves
+                    highlight <position> - highlight possible moves for a piece given its start position
                     help - possible commands
                     quit - exit chess
                 """;
