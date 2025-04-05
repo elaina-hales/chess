@@ -1,22 +1,37 @@
 package menus;
 
 import chess.ChessGame;
+import chess.ChessPosition;
 import client.ServerFacade;
 import repl.GameState;
 import ui.DrawChessBoard;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class GameMenu {
     public static GameState joined = GameState.JOINED_GAME;
     public static String username = "";
     public static String color = "";
+    private static Map<Character, Integer> colMap = new HashMap<>();
+
 
     public GameMenu() {
     }
 
     public static String eval(String input, ServerFacade server, String givenUsername) {
+        colMap.put('a', 1);
+        colMap.put('b', 2);
+        colMap.put('c', 3);
+        colMap.put('d', 4);
+        colMap.put('e', 5);
+        colMap.put('f', 6);
+        colMap.put('g', 7);
+        colMap.put('h', 8);
+
         try {
             username = givenUsername;
             var tokens = input.toLowerCase().split(" ");
@@ -52,8 +67,12 @@ public class GameMenu {
         if (!Pattern.matches("[a-h][1-8]", input)) {
             return "Invalid input. Input must be a lowercase letter (a-h) followed by a number (1-8).";
         }
+        Character e = input.charAt(0);
+        int row = Character.getNumericValue(input.charAt(1));
+        int col = colMap.get(e);
+        ChessPosition startPosition = new ChessPosition(row, col);
         DrawChessBoard d = new DrawChessBoard();
-//        d.highlight(new ChessGame(), color, );
+        d.highlight(new ChessGame(), color, startPosition);
         return "";
     }
 
