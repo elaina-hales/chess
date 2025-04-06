@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public class GameMenu {
     public static GameState joined = GameState.JOINED_GAME;
     public static String username = "";
-    public static String color = "";
+    public static ChessGame.TeamColor color;
     private static Map<Character, Integer> colMap = new HashMap<>();
 
 
@@ -59,20 +59,41 @@ public class GameMenu {
 
     public static String redraw() {
         DrawChessBoard d = new DrawChessBoard();
-        d.draw(new ChessGame(), color, false);
+        String strColor;
+        if (color == ChessGame.TeamColor.WHITE) {
+            strColor = "white";
+        } else {
+            strColor = "black";
+        }
+        d.draw(new ChessGame(), strColor, false);
         return "";
     }
 
     public static String highlight(String input) {
         if (!Pattern.matches("[a-h][1-8]", input)) {
-            return "Invalid input. Input must be a lowercase letter (a-h) followed by a number (1-8).";
+            return "Invalid input. Input must be a lowercase letter (a-h) followed by a number (1-8).\n";
         }
+
         Character e = input.charAt(0);
         int row = Character.getNumericValue(input.charAt(1));
         int col = colMap.get(e);
         ChessPosition startPosition = new ChessPosition(row, col);
+        ChessGame chess = new ChessGame();
+        if (chess.getBoard().getPiece(startPosition) == null){
+            return "There is no piece at " + input + ". Try again.\n";
+        }
+        if (chess.getBoard().getPiece(startPosition).getTeamColor() != color) {
+            return "You have attempted to highlight moves for a piece that is not your own, which is not allowed. Try again.\n";
+        }
+        // add a null piece case
         DrawChessBoard d = new DrawChessBoard();
-        d.highlight(new ChessGame(), color, startPosition);
+        String strColor;
+        if (color == ChessGame.TeamColor.WHITE) {
+            strColor = "white";
+        } else {
+            strColor = "black";
+        }
+        d.highlight(new ChessGame(), strColor, startPosition);
         return "";
     }
 

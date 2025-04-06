@@ -9,6 +9,7 @@ import ui.DrawChessBoard;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class PostLogin {
@@ -134,7 +135,13 @@ public class PostLogin {
     public static String successJoin(String player){
         joined = GameState.JOINED_GAME;
         GameMenu.joined = GameState.JOINED_GAME;
-        GameMenu.color = player;
+        ChessGame.TeamColor current;
+        if (Objects.equals(player, "black")) {
+            current = ChessGame.TeamColor.BLACK;
+        } else {
+            current = ChessGame.TeamColor.WHITE;
+        }
+        GameMenu.color = current;
         DrawChessBoard d = new DrawChessBoard();
         d.draw(new ChessGame(), player, false);
         return GameMenu.help();

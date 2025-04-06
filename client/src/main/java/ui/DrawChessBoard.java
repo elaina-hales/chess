@@ -11,16 +11,19 @@ import static ui.EscapeSequences.*;
 
 public class DrawChessBoard {
     private final Collection<ChessPosition> endPositions = new ArrayList<>();
+    private ChessPosition startPosition = null;
 
     public DrawChessBoard(){
     }
 
     public void highlight(ChessGame chess, String perspective, ChessPosition startPosition){
         Collection<ChessMove> moves = chess.validMoves(startPosition);
+        this.startPosition = startPosition;
         for (ChessMove move: moves){
             ChessPosition pos = move.getEndPosition();
             endPositions.add(pos);
         }
+        System.out.println(endPositions);
         draw(chess, perspective, true);
     }
 
@@ -111,12 +114,23 @@ public class DrawChessBoard {
         out.print(SET_TEXT_BOLD);
         ChessPosition np = new ChessPosition(row, column);
         ChessPiece current = board.getPiece(np);
-        if (endPositions.contains(np)) {
+        if (np.equals(startPosition)){
             out.print(SET_TEXT_COLOR_DARK_GREY);
-            if ((j + i) % 2 != 0){
-                out.print(SET_BG_COLOR_LIGHT_GREEN);
+            out.print(SET_BG_COLOR_WHITE);
+        } else {
+            if (endPositions.contains(np)) {
+                out.print(SET_TEXT_COLOR_DARK_GREY);
+                if ((j + i) % 2 != 0){
+                    out.print(SET_BG_COLOR_SOFT_DARK_GREEN);
+                } else {
+                    out.print(SET_BG_COLOR_SOFT_LIGHT_GREEN);
+                }
             } else {
-                out.print(SET_BG_COLOR_DARK_GREEN);
+                if ((j + i) % 2 != 0){
+                    out.print(SET_BG_COLOR_LIGHT_BROWN);
+                } else {
+                    out.print(SET_BG_COLOR_DARK_BROWN);
+                }
             }
         }
         out.print(SET_TEXT_COLOR_WHITE);
