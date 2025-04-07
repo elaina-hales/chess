@@ -107,7 +107,7 @@ public class DrawChessBoard {
         out.print(SET_TEXT_COLOR_WHITE);
         ChessPosition np = new ChessPosition(row, column);
         ChessPiece current = board.getPiece(np);
-        writeSquare(out, current);
+        writeSquare(out, current, false);
     }
 
     private void drawRowHighlight(PrintStream out, ChessBoard board, int row, int column, int i, int j) {
@@ -117,6 +117,7 @@ public class DrawChessBoard {
         if (np.equals(startPosition)){
             out.print(SET_TEXT_COLOR_DARK_GREY);
             out.print(SET_BG_COLOR_WHITE);
+            writeSquare(out, current, true);
         } else {
             if (endPositions.contains(np)) {
                 out.print(SET_TEXT_COLOR_DARK_GREY);
@@ -125,25 +126,30 @@ public class DrawChessBoard {
                 } else {
                     out.print(SET_BG_COLOR_SOFT_LIGHT_GREEN);
                 }
+                writeSquare(out, current, false);
             } else {
                 if ((j + i) % 2 != 0){
                     out.print(SET_BG_COLOR_LIGHT_BROWN);
                 } else {
                     out.print(SET_BG_COLOR_DARK_BROWN);
                 }
+                writeSquare(out, current, false);
             }
         }
-        out.print(SET_TEXT_COLOR_WHITE);
-        writeSquare(out, current);
     }
 
-    private void writeSquare(PrintStream out, ChessPiece current) {
+    private void writeSquare(PrintStream out, ChessPiece current, boolean isHighlight) {
         String piece = "   ";
         if (current != null) {
-            String color = switch (current.getTeamColor()) {
-                case WHITE -> SET_TEXT_COLOR_WHITE;
-                case BLACK -> SET_TEXT_COLOR_BLACK;
-            };
+            String color;
+            if (isHighlight){
+                color = SET_TEXT_COLOR_RED;
+            } else {
+                color = switch (current.getTeamColor()) {
+                    case WHITE -> SET_TEXT_COLOR_WHITE;
+                    case BLACK -> SET_TEXT_COLOR_BLACK;
+                };
+            }
             piece = switch (current.getPieceType()) {
                 case ChessPiece.PieceType.ROOK -> " R ";
                 case ChessPiece.PieceType.KING -> " K ";

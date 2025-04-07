@@ -85,7 +85,6 @@ public class GameMenu {
         if (chess.getBoard().getPiece(startPosition).getTeamColor() != color) {
             return "You have attempted to highlight moves for a piece that is not your own, which is not allowed. Try again.\n";
         }
-        // add a null piece case
         DrawChessBoard d = new DrawChessBoard();
         String strColor;
         if (color == ChessGame.TeamColor.WHITE) {
