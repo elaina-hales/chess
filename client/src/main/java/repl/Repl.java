@@ -33,8 +33,8 @@ public class Repl {
                     authToken = PreLogin.getToken();
                     if (joined == JOINED_GAME){
                         result = GameMenu.eval(line, server, username);
-                        System.out.print(result);
                         joined = GameMenu.joined;
+                        System.out.print(result);
                     } else {
                         result = PostLogin.eval(line, server, authToken);
                         System.out.print(result);

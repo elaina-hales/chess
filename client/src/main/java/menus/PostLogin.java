@@ -15,7 +15,8 @@ import java.util.regex.Pattern;
 public class PostLogin {
     public static State state = State.LOGGED_IN;
     public static GameState joined = GameState.NOT_JOINED;
-    private static HashMap<Integer, Integer> gameIDsAndTmpIDs = new HashMap<>();
+    private static final HashMap<Integer, Integer> gameIDsAndTmpIDs = new HashMap<>();
+    public static boolean isObserver = false;
 
     public PostLogin() {
     }
@@ -153,7 +154,10 @@ public class PostLogin {
             ChessGame chess = new ChessGame();
             DrawChessBoard d = new DrawChessBoard();
             d.draw(chess, "white", false);
-            return "";
+            isObserver = true;
+            joined = GameState.JOINED_GAME;
+            GameMenu.joined = GameState.JOINED_GAME;
+            return GameMenu.help();
         }
         throw new Exception("Error: bad input. Expected: <id>\n");
     }

@@ -1,15 +1,14 @@
 package menus;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import client.ServerFacade;
 import repl.GameState;
 import ui.DrawChessBoard;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class GameMenu {
@@ -40,7 +39,7 @@ public class GameMenu {
             return switch (cmd) {
                 case "redraw" -> redraw();
                 case "leave" -> leave();
-                case "move" -> null;
+                case "move" -> makeMove(params);
                 case "resign" -> null;
                 case "highlight" -> highlight(params[0]);
                 case "quit" -> "quit";
@@ -60,7 +59,7 @@ public class GameMenu {
     public static String redraw() {
         DrawChessBoard d = new DrawChessBoard();
         String strColor;
-        if (color == ChessGame.TeamColor.WHITE) {
+        if ((color == ChessGame.TeamColor.WHITE) || (PostLogin.isObserver)) {
             strColor = "white";
         } else {
             strColor = "black";
@@ -80,14 +79,11 @@ public class GameMenu {
         ChessPosition startPosition = new ChessPosition(row, col);
         ChessGame chess = new ChessGame();
         if (chess.getBoard().getPiece(startPosition) == null){
-            return "There is no piece at " + input + ". Try again.\n";
-        }
-        if (chess.getBoard().getPiece(startPosition).getTeamColor() != color) {
-            return "You have attempted to highlight moves for a piece that is not your own, which is not allowed. Try again.\n";
+            return "There is no piece at " + input + ".\n";
         }
         DrawChessBoard d = new DrawChessBoard();
         String strColor;
-        if (color == ChessGame.TeamColor.WHITE) {
+        if ((color == ChessGame.TeamColor.WHITE) || (PostLogin.isObserver)) {
             strColor = "white";
         } else {
             strColor = "black";
@@ -96,7 +92,49 @@ public class GameMenu {
         return "";
     }
 
+    public static String makeMove(String... params) {
+        if (PostLogin.isObserver){
+            return "You are not authorized to make moves.";
+        }
+        if (params.length != 2 || !Pattern.matches("[a-h][1-8]", params[0]) || !Pattern.matches("[a-h][1-8]", params[1])) {
+            return "Invalid input. Input must be two positions (a lowercase letter (a-h) followed by a number (1-8)).\n";
+        }
+        ChessGame chess = new ChessGame();
+
+        Character e = params[0].charAt(0);
+        int startRow = Character.getNumericValue(params[0].charAt(1));
+        int startCol = colMap.get(e);
+        ChessPosition startPos = new ChessPosition(startRow, startCol);
+
+        Character e2 = params[1].charAt(0);
+        int endRow = Character.getNumericValue(params[1].charAt(1));
+        int endCol = colMap.get(e2);
+        ChessPosition endPos = new ChessPosition(endRow, endCol);
+        if (chess.getBoard().getPiece(startPos) == null) {
+            return "There is no piece at your start position of" + params[0] + ".\n";
+        } else if (chess.getBoard().getPiece(startPos).getTeamColor() != color) {
+            return "The piece at your start position of" + params[0] + "is not your same team color.\n";
+        }
+        ChessPiece piece = chess.getBoard().getPiece(startPos);
+//        if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN) && (endRow == 8)) {
+//            Scanner scanner = new Scanner(System.in);
+//            String i = scanner.next();
+//
+//        }
+
+        return "";
+    }
+
     public static String help() {
+        if (PostLogin.isObserver){
+            return """
+                    redraw - board
+                    leave - the game
+                    highlight <position> - highlight possible moves for a piece given its start position
+                    help - possible commands
+                    quit - exit chess
+                """;
+        }
         return """
                     redraw - board
                     leave - the game
