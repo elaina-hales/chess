@@ -2,6 +2,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import handlers.*;
+import server.websocket.WebSocketHandler;
 import spark.*;
 
 
@@ -11,6 +12,9 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        Spark.webSocket("/ws", new WebSocketHandler());
+
 
         try {
             createRoutes();

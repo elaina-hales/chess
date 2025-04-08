@@ -17,6 +17,10 @@ public class ServerFacade {
         this.serverUrl = url;
     }
 
+    public String getURL(){
+        return serverUrl;
+    }
+
     public ReturnObject login(String username, String password) throws IOException, URISyntaxException {
         String url = serverUrl + "session";
         String method = "POST";

@@ -7,6 +7,7 @@ import chess.ChessPosition;
 import client.ServerFacade;
 import repl.GameState;
 import ui.DrawChessBoard;
+import websocket.WebSocketFacade;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -21,7 +22,7 @@ public class GameMenu {
     public GameMenu() {
     }
 
-    public static String eval(String input, ServerFacade server, String givenUsername) {
+    public static String eval(String input, ServerFacade server, String givenUsername, WebSocketFacade ws) {
         colMap.put('a', 1);
         colMap.put('b', 2);
         colMap.put('c', 3);

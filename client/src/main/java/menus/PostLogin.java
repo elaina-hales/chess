@@ -2,11 +2,13 @@ package menus;
 
 import chess.ChessGame;
 import client.*;
+import exception.ResponseException;
 import model.GameData;
 import repl.GameState;
 import repl.State;
 import ui.DrawChessBoard;
-
+import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
@@ -21,7 +23,7 @@ public class PostLogin {
     public PostLogin() {
     }
 
-    public static String eval(String input, ServerFacade server, String authToken) {
+    public static String eval(String input, ServerFacade server, String authToken, WebSocketFacade ws, String username) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
@@ -29,7 +31,7 @@ public class PostLogin {
             return switch (cmd) {
                 case "create" -> create(authToken, server, params);
                 case "list" -> list(server, authToken);
-                case "join" -> join(server, authToken, params);
+                case "join" -> join(username, ws, server, authToken, params);
                 case "observe" -> observe(params);
                 case "logout" -> logout(server, authToken);
                 case "quit" -> "quit";
@@ -97,16 +99,17 @@ public class PostLogin {
         }
     }
 
-    public static String join(ServerFacade server, String authToken, String... params) {
+    public static String join(String username, WebSocketFacade ws, ServerFacade server, String authToken, String... params) {
         if (params.length >= 2) {
             try {
                 var player = params[1];
                 int statusCode;
                 ReturnObject r = null;
+                int id = 0;
                 if (Pattern.matches("[a-zA-Za-z]*", params[0])){
                     statusCode = 400;
                 } else {
-                    int id = Integer.parseInt(params[0]);
+                    id = Integer.parseInt(params[0]);
                     if (gameIDsAndTmpIDs.isEmpty()){
                         statusCode = 800;
                     } else if (id > gameIDsAndTmpIDs.size()) {
@@ -117,7 +120,7 @@ public class PostLogin {
                     }
                 }
                 return switch (statusCode) {
-                    case 200 -> successJoin(player);
+                    case 200 -> successJoin(player, ws, gameIDsAndTmpIDs.get(id), username);
                     case 400 -> "Error: bad input. Expected: <id> <WHITE|BLACK>. Please try again.\n";
                     case 401 -> "You are unauthorized to do this. Please try again.\n";
                     case 403 -> "That color is already taken. Select a different color or game and try again.\n";
@@ -133,7 +136,7 @@ public class PostLogin {
         }
     }
 
-    public static String successJoin(String player){
+    public static String successJoin(String player, WebSocketFacade ws, int gameID, String username) throws ResponseException {
         joined = GameState.JOINED_GAME;
         GameMenu.joined = GameState.JOINED_GAME;
         ChessGame.TeamColor current;
@@ -142,6 +145,7 @@ public class PostLogin {
         } else {
             current = ChessGame.TeamColor.WHITE;
         }
+        ws.sendWsJoin(username, gameID);
         GameMenu.color = current;
         DrawChessBoard d = new DrawChessBoard();
         d.draw(new ChessGame(), player, false);

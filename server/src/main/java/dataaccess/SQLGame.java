@@ -66,6 +66,7 @@ public class SQLGame implements GameDAO{
         }
     }
 
+    // add a method that updates sql with the new game
 
     @Override
     public int createGame(String gameName) {
