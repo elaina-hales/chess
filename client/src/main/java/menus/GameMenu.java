@@ -40,7 +40,7 @@ public class GameMenu {
                 case "redraw" -> redraw();
                 case "leave" -> leave();
                 case "move" -> makeMove(params);
-                case "resign" -> null;
+                case "resign" -> resign();
                 case "highlight" -> highlight(params[0]);
                 case "quit" -> "quit";
                 default -> help();
@@ -50,9 +50,22 @@ public class GameMenu {
         }
     }
 
+    public static String resign(){
+        if (PostLogin.isObserver){
+            return "You cannot resign as an observer.\n";
+        } else {
+            ChessGame chess = new ChessGame();
+            chess.setIsOver(true);
+            joined = GameState.NOT_JOINED;
+            PostLogin.joined = GameState.NOT_JOINED;
+            return "You have successfully resigned.\n";
+        }
+    }
+
     public static String leave() {
         joined = GameState.NOT_JOINED;
         PostLogin.joined = GameState.NOT_JOINED;
+        PostLogin.isObserver = false;
         return "You have successfully left the game.\n";
     }
 
@@ -67,6 +80,7 @@ public class GameMenu {
         d.draw(new ChessGame(), strColor, false);
         return "";
     }
+
 
     public static String highlight(String input) {
         if (!Pattern.matches("[a-h][1-8]", input)) {
@@ -94,7 +108,7 @@ public class GameMenu {
 
     public static String makeMove(String... params) {
         if (PostLogin.isObserver){
-            return "You are not authorized to make moves.";
+            return "You are not authorized to make moves.\n";
         }
         if (params.length != 2 || !Pattern.matches("[a-h][1-8]", params[0]) || !Pattern.matches("[a-h][1-8]", params[1])) {
             return "Invalid input. Input must be two positions (a lowercase letter (a-h) followed by a number (1-8)).\n";

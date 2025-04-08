@@ -14,8 +14,18 @@ import java.util.Objects;
 public class ChessGame {
     private ChessBoard chessBoard = new ChessBoard();
     private ChessGame.TeamColor teamTurn = ChessGame.TeamColor.WHITE;
+    private boolean isOver = false;
+
     public ChessGame() {
         chessBoard.resetBoard();
+    }
+
+    public void setIsOver(boolean given) {
+        isOver = given;
+    }
+
+    public boolean getIsOver(){
+        return isOver;
     }
 
     /**
@@ -205,6 +215,7 @@ public class ChessGame {
                 }
             }
         }
+        isOver = true;
         return true;
     }
 
@@ -221,6 +232,7 @@ public class ChessGame {
             return areNoMoves(teamColor);
         }
     }
+
 
     /**
      * Determines if the given team is in stalemate, which here is defined as having
