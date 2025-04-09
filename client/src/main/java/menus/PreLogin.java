@@ -3,6 +3,7 @@ package menus;
 import client.ReturnObject;
 import client.ServerFacade;
 import repl.State;
+import websocket.ServerMessageObserver;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -11,11 +12,18 @@ public class PreLogin {
     public static String username = null;
     public static State state = State.LOGGED_OUT;
     private static String authToken = "";
+    private static ServerFacade server;
+    private String serverUrl;
+    private ServerMessageObserver serverMessageObserver;
 
-    public PreLogin() {
+
+    public PreLogin(String serverUrl, ServerMessageObserver serverMessageObserver) {
+        server = new ServerFacade(serverUrl);
+        this.serverUrl = serverUrl;
+        this.serverMessageObserver = serverMessageObserver;
     }
 
-    public static String eval(String input, ServerFacade server) {
+    public String eval(String input) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";

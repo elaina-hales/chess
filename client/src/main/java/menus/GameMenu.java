@@ -1,13 +1,12 @@
 package menus;
 
 import chess.ChessGame;
-import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import client.ServerFacade;
 import repl.GameState;
 import ui.DrawChessBoard;
-import websocket.WebSocketFacade;
+import websocket.ServerMessageObserver;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -17,12 +16,26 @@ public class GameMenu {
     public static String username = "";
     public static ChessGame.TeamColor color;
     private static Map<Character, Integer> colMap = new HashMap<>();
+    private static ServerFacade server;
+    private String serverUrl;
+    private ServerMessageObserver serverMessageObserver;
 
 
-    public GameMenu() {
+    public GameMenu(String serverUrl, ServerMessageObserver serverMessageObserver) {
+        server = new ServerFacade(serverUrl);
+        this.serverUrl = serverUrl;
+        this.serverMessageObserver = serverMessageObserver;
+            colMap.put('a', 1);
+            colMap.put('b', 2);
+            colMap.put('c', 3);
+            colMap.put('d', 4);
+            colMap.put('e', 5);
+            colMap.put('f', 6);
+            colMap.put('g', 7);
+            colMap.put('h', 8);
     }
 
-    public static String eval(String input, ServerFacade server, String givenUsername, WebSocketFacade ws) {
+    public String eval(String input, String givenUsername) {
         colMap.put('a', 1);
         colMap.put('b', 2);
         colMap.put('c', 3);

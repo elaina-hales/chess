@@ -7,8 +7,8 @@ import model.GameData;
 import repl.GameState;
 import repl.State;
 import ui.DrawChessBoard;
-import websocket.NotificationHandler;
-import websocket.WebSocketFacade;
+import websocket.ServerMessageObserver;
+import websocket.WebSocketCommunicator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
@@ -19,11 +19,17 @@ public class PostLogin {
     public static GameState joined = GameState.NOT_JOINED;
     private static final HashMap<Integer, Integer> gameIDsAndTmpIDs = new HashMap<>();
     public static boolean isObserver = false;
+    private static ServerFacade server;
+    private static String serverUrl;
+    private static ServerMessageObserver serverMessageObserver;
 
-    public PostLogin() {
+    public PostLogin(String serverUrl, ServerMessageObserver serverMessageObserver) {
+        server = new ServerFacade(serverUrl);
+        this.serverUrl = serverUrl;
+        this.serverMessageObserver = serverMessageObserver;
     }
 
-    public static String eval(String input, ServerFacade server, String authToken, WebSocketFacade ws, String username) {
+    public String eval(String input, String authToken, String username) {
         try {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
@@ -31,8 +37,8 @@ public class PostLogin {
             return switch (cmd) {
                 case "create" -> create(authToken, server, params);
                 case "list" -> list(server, authToken);
-                case "join" -> join(username, ws, server, authToken, params);
-                case "observe" -> observe(params);
+                case "join" -> join(username, server, authToken, params);
+                case "observe" -> observe(username, params);
                 case "logout" -> logout(server, authToken);
                 case "quit" -> "quit";
                 default -> help();
@@ -99,7 +105,7 @@ public class PostLogin {
         }
     }
 
-    public static String join(String username, WebSocketFacade ws, ServerFacade server, String authToken, String... params) {
+    public static String join(String username, ServerFacade server, String authToken, String... params) {
         if (params.length >= 2) {
             try {
                 var player = params[1];
@@ -120,7 +126,7 @@ public class PostLogin {
                     }
                 }
                 return switch (statusCode) {
-                    case 200 -> successJoin(player, ws, gameIDsAndTmpIDs.get(id), username);
+                    case 200 -> successJoin(player, gameIDsAndTmpIDs.get(id), username);
                     case 400 -> "Error: bad input. Expected: <id> <WHITE|BLACK>. Please try again.\n";
                     case 401 -> "You are unauthorized to do this. Please try again.\n";
                     case 403 -> "That color is already taken. Select a different color or game and try again.\n";
@@ -136,7 +142,7 @@ public class PostLogin {
         }
     }
 
-    public static String successJoin(String player, WebSocketFacade ws, int gameID, String username) throws ResponseException {
+    public static String successJoin(String player, int gameID, String username) throws ResponseException {
         joined = GameState.JOINED_GAME;
         GameMenu.joined = GameState.JOINED_GAME;
         ChessGame.TeamColor current;
@@ -145,6 +151,7 @@ public class PostLogin {
         } else {
             current = ChessGame.TeamColor.WHITE;
         }
+        WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, serverMessageObserver);
         ws.sendWsJoin(username, gameID);
         GameMenu.color = current;
         DrawChessBoard d = new DrawChessBoard();
@@ -152,10 +159,12 @@ public class PostLogin {
         return GameMenu.help();
     }
 
-    public static String observe(String... params) throws Exception {
+    public static String observe(String username, String ... params) throws Exception {
         if (params.length >= 1) {
-            var id = params[0];
+            int id = Integer.parseInt(params[0]);
             ChessGame chess = new ChessGame();
+            WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, serverMessageObserver);
+            ws.sendWsJoin(username, gameIDsAndTmpIDs.get(id));
             DrawChessBoard d = new DrawChessBoard();
             d.draw(chess, "white", false);
             isObserver = true;
