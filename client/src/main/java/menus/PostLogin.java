@@ -21,7 +21,7 @@ public class PostLogin {
     public static boolean isObserver = false;
     private static ServerFacade server;
     private static String serverUrl;
-    public static Integer gameID;
+    public static Integer currentGameID;
 
     public PostLogin(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -150,7 +150,7 @@ public class PostLogin {
         } else {
             current = ChessGame.TeamColor.WHITE;
         }
-        this.gameID = gameID;
+        currentGameID = gameID;
         WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, new GameMenu(serverUrl));
         ws.sendWsJoin(authToken, gameID);
         GameMenu.color = current;
@@ -164,7 +164,7 @@ public class PostLogin {
             if (gameIDsAndTmpIDs.isEmpty()){
                 return "You must list available games before joining one. Enter 'list' to list available games.\n";
             }
-            gameID = gameIDsAndTmpIDs.get(id);
+            currentGameID = gameIDsAndTmpIDs.get(id);
             WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, new GameMenu(serverUrl));
             ws.sendWsJoin(authToken, gameIDsAndTmpIDs.get(id));
             isObserver = true;

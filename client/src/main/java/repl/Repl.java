@@ -44,7 +44,7 @@ public class Repl {
                 if (state == LOGGED_IN) {
                     authToken = PreLogin.getToken();
                     if (joined == JOINED_GAME){
-                        result = gameMenu.eval(line, username, authToken);
+                        result = gameMenu.eval(line, username, authToken, PostLogin.currentGameID);
                         joined = gameMenu.joined;
                         System.out.print(result);
                     } else {

@@ -24,12 +24,11 @@ public class GameMenu implements ServerMessageObserver {
     public static ChessGame.TeamColor color;
     private static Map<Character, Integer> colMap = new HashMap<>();
     private static ServerFacade server;
-    private String serverUrl;
+    private static String serverUrl;
     private static boolean isHighlight = false;
     private static ChessPosition startPosition = new ChessPosition(-1, -1);
-    private ChessGame chess;
-    private final Integer gameID = PostLogin.gameID;
-    private final HashMap<String, ChessPiece.PieceType> pieceMap = new HashMap<>();
+    private static ChessGame chess;
+    private static final HashMap<String, ChessPiece.PieceType> pieceMap = new HashMap<>();
 
     public GameMenu(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -49,7 +48,7 @@ public class GameMenu implements ServerMessageObserver {
         pieceMap.put("K", ChessPiece.PieceType.KNIGHT);
     }
 
-    public String eval(String input, String givenUsername, String authtoken) {
+    public String eval(String input, String givenUsername, String authtoken, int gameID) {
         try {
             username = givenUsername;
             var tokens = input.toLowerCase().split(" ");
@@ -57,9 +56,9 @@ public class GameMenu implements ServerMessageObserver {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "redraw" -> redraw();
-                case "leave" -> leave(authtoken);
-                case "move" -> makeMove(authtoken, params);
-                case "resign" -> resign(authtoken);
+                case "leave" -> leave(authtoken, gameID);
+                case "move" -> makeMove(authtoken, gameID, params);
+                case "resign" -> resign(authtoken, gameID);
                 case "highlight" -> highlight(params[0]);
                 case "quit" -> "quit";
                 default -> help();
@@ -69,7 +68,7 @@ public class GameMenu implements ServerMessageObserver {
         }
     }
 
-    public String resign(String authtoken) throws ResponseException {
+    public String resign(String authtoken, int gameID) throws ResponseException {
         WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, this);
         ws.sendWsResign(authtoken, gameID);
         if (!PostLogin.isObserver){
@@ -79,9 +78,10 @@ public class GameMenu implements ServerMessageObserver {
             waitForNotifications();
             return "You have successfully resigned.\n";
         }
+        return "";
     }
 
-    public String leave(String authtoken) throws ResponseException {
+    public String leave(String authtoken,  int gameID) throws ResponseException {
         WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, this);
         ws.sendWsLeave(authtoken, gameID);
         joined = GameState.NOT_JOINED;
@@ -107,7 +107,6 @@ public class GameMenu implements ServerMessageObserver {
         if (!Pattern.matches("[a-h][1-8]", input)) {
             return "Invalid input. Input must be a lowercase letter (a-h) followed by a number (1-8).\n";
         }
-
         Character e = input.charAt(0);
         int row = Character.getNumericValue(input.charAt(1));
         int col = colMap.get(e);
@@ -127,7 +126,7 @@ public class GameMenu implements ServerMessageObserver {
         return "";
     }
 
-    public String makeMove(String authtoken, String... params) throws ResponseException {
+    public String makeMove(String authtoken,  int gameID, String... params) throws ResponseException {
         if (PostLogin.isObserver){
             return "You are not authorized to make moves.\n";
         }
