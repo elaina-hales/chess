@@ -68,4 +68,8 @@ public class MemoryGame implements GameDAO{
     public void clear(){
         games.clear();
     }
+
+    @Override
+    public void updateGameNewMove(ChessGame chess, Integer gameID) {
+    }
 }

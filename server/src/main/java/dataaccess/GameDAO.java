@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.GameData;
 import service.AlreadyTakenException;
 import service.BadReqException;
@@ -12,4 +13,6 @@ public interface GameDAO {
      int createGame(String gameName);
      void updateGame(int gameID, String playerColor, String username) throws AlreadyTakenException, BadReqException;
      void clear();
+
+    void updateGameNewMove(ChessGame chess, Integer gameID);
 }

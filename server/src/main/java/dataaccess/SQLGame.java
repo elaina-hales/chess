@@ -66,8 +66,6 @@ public class SQLGame implements GameDAO{
         }
     }
 
-    // add a method that updates sql with the new game
-
     @Override
     public int createGame(String gameName) {
         Random random = new Random();
@@ -151,6 +149,23 @@ public class SQLGame implements GameDAO{
                 preparedStatement.executeUpdate();
             }
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void updateGameNewMove(ChessGame chess, Integer gameID) {
+        Gson g = new Gson();
+        String chessSer = g.toJson(chess);
+        var statement = "";
+        try (var conn = DatabaseManager.getConnection()) {
+            statement = "UPDATE Game SET ChessGame=? WHERE GameID=?";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, chessSer);
+                preparedStatement.setInt(2, gameID);
+                preparedStatement.executeUpdate();
+            }
+        } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
