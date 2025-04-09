@@ -1,12 +1,15 @@
 package menus;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import client.ServerFacade;
+import exception.ResponseException;
 import repl.GameState;
 import ui.DrawChessBoard;
 import websocket.ServerMessageObserver;
+import websocket.WebSocketCommunicator;
 import websocket.messages.ServerMessage;
 
 import static chess.ChessGame.TeamColor.BLACK;
@@ -24,7 +27,9 @@ public class GameMenu implements ServerMessageObserver {
     private String serverUrl;
     private static boolean isHighlight = false;
     private static ChessPosition startPosition = new ChessPosition(-1, -1);
-
+    private ChessGame chess;
+    private final Integer gameID = PostLogin.gameID;
+    private final HashMap<String, ChessPiece.PieceType> pieceMap = new HashMap<>();
 
     public GameMenu(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -37,9 +42,14 @@ public class GameMenu implements ServerMessageObserver {
         colMap.put('f', 6);
         colMap.put('g', 7);
         colMap.put('h', 8);
+
+        pieceMap.put("Q", ChessPiece.PieceType.QUEEN);
+        pieceMap.put("B", ChessPiece.PieceType.BISHOP);
+        pieceMap.put("R", ChessPiece.PieceType.ROOK);
+        pieceMap.put("K", ChessPiece.PieceType.KNIGHT);
     }
 
-    public String eval(String input, String givenUsername) {
+    public String eval(String input, String givenUsername, String authtoken) {
         try {
             username = givenUsername;
             var tokens = input.toLowerCase().split(" ");
@@ -47,9 +57,9 @@ public class GameMenu implements ServerMessageObserver {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "redraw" -> redraw();
-                case "leave" -> leave();
-                case "move" -> makeMove(params);
-                case "resign" -> resign();
+                case "leave" -> leave(authtoken);
+                case "move" -> makeMove(authtoken, params);
+                case "resign" -> resign(authtoken);
                 case "highlight" -> highlight(params[0]);
                 case "quit" -> "quit";
                 default -> help();
@@ -59,26 +69,29 @@ public class GameMenu implements ServerMessageObserver {
         }
     }
 
-    public static String resign(){
-        if (PostLogin.isObserver){
-            return "You cannot resign as an observer.\n";
-        } else {
-            ChessGame chess = new ChessGame();
+    public String resign(String authtoken) throws ResponseException {
+        WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, this);
+        ws.sendWsResign(authtoken, gameID);
+        if (!PostLogin.isObserver){
             chess.setIsOver(true);
             joined = GameState.NOT_JOINED;
             PostLogin.joined = GameState.NOT_JOINED;
+            waitForNotifications();
             return "You have successfully resigned.\n";
         }
     }
 
-    public static String leave() {
+    public String leave(String authtoken) throws ResponseException {
+        WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, this);
+        ws.sendWsLeave(authtoken, gameID);
         joined = GameState.NOT_JOINED;
         PostLogin.joined = GameState.NOT_JOINED;
         PostLogin.isObserver = false;
+        waitForNotifications();
         return "You have successfully left the game.\n";
     }
 
-    public static String redraw() {
+    public String redraw() {
         DrawChessBoard d = new DrawChessBoard();
         String strColor;
         if ((color == ChessGame.TeamColor.WHITE) || (PostLogin.isObserver)) {
@@ -86,12 +99,11 @@ public class GameMenu implements ServerMessageObserver {
         } else {
             strColor = "black";
         }
-        d.draw(new ChessGame(), strColor, false);
+        d.draw(chess, strColor, false);
         return "";
     }
 
-
-    public static String highlight(String input) {
+    public String highlight(String input) {
         if (!Pattern.matches("[a-h][1-8]", input)) {
             return "Invalid input. Input must be a lowercase letter (a-h) followed by a number (1-8).\n";
         }
@@ -100,7 +112,6 @@ public class GameMenu implements ServerMessageObserver {
         int row = Character.getNumericValue(input.charAt(1));
         int col = colMap.get(e);
         startPosition = new ChessPosition(row, col);
-        ChessGame chess = new ChessGame();
         if (chess.getBoard().getPiece(startPosition) == null){
             return "There is no piece at " + input + ".\n";
         }
@@ -112,19 +123,17 @@ public class GameMenu implements ServerMessageObserver {
             strColor = "black";
         }
         isHighlight = true;
-        d.highlight(new ChessGame(), strColor, startPosition);
+        d.highlight(chess, strColor, startPosition);
         return "";
     }
 
-    public static String makeMove(String... params) {
+    public String makeMove(String authtoken, String... params) throws ResponseException {
         if (PostLogin.isObserver){
             return "You are not authorized to make moves.\n";
         }
-        if (params.length != 2 || !Pattern.matches("[a-h][1-8]", params[0]) || !Pattern.matches("[a-h][1-8]", params[1])) {
+        if (params.length > 3 || !Pattern.matches("[a-h][1-8]", params[0]) || !Pattern.matches("[a-h][1-8]", params[1])) {
             return "Invalid input. Input must be two positions (a lowercase letter (a-h) followed by a number (1-8)).\n";
         }
-        ChessGame chess = new ChessGame();
-
         Character e = params[0].charAt(0);
         int startRow = Character.getNumericValue(params[0].charAt(1));
         int startCol = colMap.get(e);
@@ -139,13 +148,20 @@ public class GameMenu implements ServerMessageObserver {
         } else if (chess.getBoard().getPiece(startPos).getTeamColor() != color) {
             return "The piece at your start position of" + params[0] + "is not your same team color.\n";
         }
-        ChessPiece piece = chess.getBoard().getPiece(startPos);
-//        if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN) && (endRow == 8)) {
-//            Scanner scanner = new Scanner(System.in);
-//            String i = scanner.next();
-//
-//        }
-
+        ChessMove move;
+        if (chess.getBoard().getPiece(startPos).equals(ChessPiece.PieceType.PAWN) && endRow == 8) {
+            String piece = params[2];
+            ChessPiece.PieceType pieceType = pieceMap.get(piece);
+            if (pieceType == null) {
+                return "Promotion Piece Type not found. Try again \n";
+            }
+            move = new ChessMove(startPos, endPos, pieceType);
+        } else {
+            move = new ChessMove(startPos, endPos, null);
+        }
+        WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, this);
+        ws.sendWsMakeMove(authtoken, gameID, move);
+        waitForNotifications();
         return "";
     }
 
@@ -162,7 +178,8 @@ public class GameMenu implements ServerMessageObserver {
         return """
                     redraw - board
                     leave - the game
-                    move <start> <end> - make a move
+                    move <start> <end> <promotion piece (optional)> - If you are promoting your pawn, include the first letter of the piece you are promoting to.
+                        Q = Queen, B = Bishop, R = Rook, K = Knight
                     resign - forfeit and leave the game
                     highlight <position> - highlight possible moves for a piece given its start position
                     help - possible commands
@@ -192,6 +209,7 @@ public class GameMenu implements ServerMessageObserver {
     }
 
     public void loadGame(ChessGame game){
+        chess = game;
         DrawChessBoard d = new DrawChessBoard();
         String strColor;
         if (color == BLACK){
@@ -203,6 +221,14 @@ public class GameMenu implements ServerMessageObserver {
             d.highlight(game, strColor, startPosition);
         } else {
             d.draw(game, strColor, false);
+        }
+    }
+
+    public static void waitForNotifications() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
