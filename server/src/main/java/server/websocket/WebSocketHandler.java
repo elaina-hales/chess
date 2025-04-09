@@ -9,13 +9,11 @@ import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import service.UnauthorizedException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
-import java.util.Collection;
 
 
 @WebSocket
@@ -141,6 +139,26 @@ public class WebSocketHandler {
         connections.broadcast(command.getGameID(), username, allElseNotification);
 
         var checkNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        if (chess.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            checkNotification.addMessage("Black is now in checkmate!");
+            connections.broadcast(command.getGameID(), null, checkNotification);
+            return;
+        }
+        if (chess.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+            checkNotification.addMessage("White is now in checkmate!");
+            connections.broadcast(command.getGameID(), null, checkNotification);
+            return;
+        }
+        if (chess.isInStalemate(ChessGame.TeamColor.BLACK)) {
+            checkNotification.addMessage("White is now in stalemate!");
+            connections.broadcast(command.getGameID(), null, checkNotification);
+            return;
+        }
+        if (chess.isInStalemate(ChessGame.TeamColor.WHITE)) {
+            checkNotification.addMessage("White is now in stalemate!");
+            connections.broadcast(command.getGameID(), null, checkNotification);
+            return;
+        }
         if (chess.isInCheck(ChessGame.TeamColor.BLACK)) {
             checkNotification.addMessage("Black is now in check!");
             connections.broadcast(command.getGameID(), null, checkNotification);
