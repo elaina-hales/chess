@@ -14,7 +14,7 @@ import static repl.State.LOGGED_IN;
 import static repl.State.LOGGED_OUT;
 
 
-public class Repl implements ServerMessageObserver {
+public class Repl {
     private State state = LOGGED_OUT;
     private GameState joined = NOT_JOINED;
     private String authToken = null;
@@ -26,9 +26,9 @@ public class Repl implements ServerMessageObserver {
 
 
     public Repl(String serverURL){
-        gameMenu = new GameMenu(serverURL, this);
-        postMenu = new PostLogin(serverURL, this);
-        preMenu = new PreLogin(serverURL, this);
+        gameMenu = new GameMenu(serverURL);
+        postMenu = new PostLogin(serverURL);
+        preMenu = new PreLogin(serverURL);
     }
 
     public void run() {
@@ -74,16 +74,5 @@ public class Repl implements ServerMessageObserver {
             }
         }
         System.out.println();
-    }
-
-    @Override
-    public void notify(ServerMessage notification) {
-        switch (notification.getServerMessageType()) {
-//            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getMessage());
-//            case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
-//            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGame());
-        }
-
-        System.out.println(notification.toString());
     }
 }

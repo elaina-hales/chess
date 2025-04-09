@@ -19,7 +19,7 @@ public class WebSocketCommunicator extends Endpoint {
     public WebSocketCommunicator(String url, ServerMessageObserver serverMessageObserver) throws ResponseException {
         try {
             url = url.replace("http", "ws");
-            URI socketURI = new URI(url + "/ws");
+            URI socketURI = new URI(url + "ws");
             this.serverMessageObserver = serverMessageObserver;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();

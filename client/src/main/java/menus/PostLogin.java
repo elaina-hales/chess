@@ -21,12 +21,10 @@ public class PostLogin {
     public static boolean isObserver = false;
     private static ServerFacade server;
     private static String serverUrl;
-    private static ServerMessageObserver serverMessageObserver;
 
-    public PostLogin(String serverUrl, ServerMessageObserver serverMessageObserver) {
+    public PostLogin(String serverUrl) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
-        this.serverMessageObserver = serverMessageObserver;
     }
 
     public String eval(String input, String authToken, String username) {
@@ -151,22 +149,17 @@ public class PostLogin {
         } else {
             current = ChessGame.TeamColor.WHITE;
         }
-        WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, serverMessageObserver);
+        WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, new GameMenu(serverUrl));
         ws.sendWsJoin(username, gameID);
         GameMenu.color = current;
-        DrawChessBoard d = new DrawChessBoard();
-        d.draw(new ChessGame(), player, false);
         return GameMenu.help();
     }
 
     public static String observe(String username, String ... params) throws Exception {
         if (params.length >= 1) {
             int id = Integer.parseInt(params[0]);
-            ChessGame chess = new ChessGame();
-            WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, serverMessageObserver);
+            WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, new GameMenu(serverUrl));
             ws.sendWsJoin(username, gameIDsAndTmpIDs.get(id));
-            DrawChessBoard d = new DrawChessBoard();
-            d.draw(chess, "white", false);
             isObserver = true;
             joined = GameState.JOINED_GAME;
             GameMenu.joined = GameState.JOINED_GAME;

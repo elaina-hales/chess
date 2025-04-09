@@ -7,35 +7,26 @@ import client.ServerFacade;
 import repl.GameState;
 import ui.DrawChessBoard;
 import websocket.ServerMessageObserver;
+import websocket.messages.ServerMessage;
 
+import javax.management.Notification;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class GameMenu {
+public class GameMenu implements ServerMessageObserver {
     public static GameState joined = GameState.JOINED_GAME;
     public static String username = "";
     public static ChessGame.TeamColor color;
     private static Map<Character, Integer> colMap = new HashMap<>();
     private static ServerFacade server;
     private String serverUrl;
-    private ServerMessageObserver serverMessageObserver;
+    private static boolean isHighlight = false;
+    private static ChessPosition startPosition = new ChessPosition(-1, -1);
 
 
-    public GameMenu(String serverUrl, ServerMessageObserver serverMessageObserver) {
+    public GameMenu(String serverUrl) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
-        this.serverMessageObserver = serverMessageObserver;
-            colMap.put('a', 1);
-            colMap.put('b', 2);
-            colMap.put('c', 3);
-            colMap.put('d', 4);
-            colMap.put('e', 5);
-            colMap.put('f', 6);
-            colMap.put('g', 7);
-            colMap.put('h', 8);
-    }
-
-    public String eval(String input, String givenUsername) {
         colMap.put('a', 1);
         colMap.put('b', 2);
         colMap.put('c', 3);
@@ -44,7 +35,9 @@ public class GameMenu {
         colMap.put('f', 6);
         colMap.put('g', 7);
         colMap.put('h', 8);
+    }
 
+    public String eval(String input, String givenUsername) {
         try {
             username = givenUsername;
             var tokens = input.toLowerCase().split(" ");
@@ -104,7 +97,7 @@ public class GameMenu {
         Character e = input.charAt(0);
         int row = Character.getNumericValue(input.charAt(1));
         int col = colMap.get(e);
-        ChessPosition startPosition = new ChessPosition(row, col);
+        startPosition = new ChessPosition(row, col);
         ChessGame chess = new ChessGame();
         if (chess.getBoard().getPiece(startPosition) == null){
             return "There is no piece at " + input + ".\n";
@@ -116,6 +109,7 @@ public class GameMenu {
         } else {
             strColor = "black";
         }
+        isHighlight = true;
         d.highlight(new ChessGame(), strColor, startPosition);
         return "";
     }
@@ -172,5 +166,31 @@ public class GameMenu {
                     help - possible commands
                     quit - exit chess
                 """;
+    }
+
+    @Override
+    public void notify(ServerMessage notification) {
+        switch (notification.getServerMessageType()) {
+            case NOTIFICATION -> displayNotification(notification.getMessage());
+            case ERROR -> displayError(notification.getErrorMessage());
+            case LOAD_GAME -> loadGame(notification.getGame());
+        }
+    }
+
+    public void displayNotification(String message) {
+        System.out.println(message);
+    }
+
+    public void displayError(String message) {
+        System.out.println(message);
+    }
+
+    public void loadGame(ChessGame game){
+        DrawChessBoard d = new DrawChessBoard();
+        if (isHighlight){
+            d.highlight(game, color.toString(), startPosition);
+        } else {
+            d.draw(game, color.toString(), false);
+        }
     }
 }

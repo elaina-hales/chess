@@ -16,6 +16,19 @@ public class ServerMessage {
     String errorMessage;
     ChessGame game;
 
+    public String getMessage() {
+        return message;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public ChessGame getGame() {
+        return game;
+    }
+
+
     public enum ServerMessageType {
         LOAD_GAME,
         ERROR,

@@ -14,13 +14,11 @@ public class PreLogin {
     private static String authToken = "";
     private static ServerFacade server;
     private String serverUrl;
-    private ServerMessageObserver serverMessageObserver;
 
 
-    public PreLogin(String serverUrl, ServerMessageObserver serverMessageObserver) {
+    public PreLogin(String serverUrl) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
-        this.serverMessageObserver = serverMessageObserver;
     }
 
     public String eval(String input) {
