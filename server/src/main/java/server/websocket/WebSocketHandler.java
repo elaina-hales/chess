@@ -173,47 +173,45 @@ public class WebSocketHandler {
 
     private void leaveGame(String username, UserGameCommand command) throws IOException, BadReqException, AlreadyTakenException {
         GameData resp = game.getGame(command.getGameID());
-        ChessGame chess = resp.game();
-        connections.remove(command.getGameID(), username);
 
         if (username.equals(resp.blackUsername())){
-            game.updateGame(command.getGameID(), "BLACK", null);
+            game.nullifyPlayer(command.getGameID(), "BLACK");
         } else if (username.equals(resp.whiteUsername())) {
-            game.updateGame(command.getGameID(), "WHITE", null);
+            game.nullifyPlayer(command.getGameID(), "WHITE");
         }
+
         var allElseNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         var message = String.format("%s left the game.\n", username);
         allElseNotification.addMessage(message);
         connections.broadcast(command.getGameID(), username, allElseNotification);
-
+        connections.remove(command.getGameID(), username);
     }
 
-    private void resign(String username, UserGameCommand command) {
+    private void resign(String username, UserGameCommand command) throws IOException {
+        GameData resp = game.getGame(command.getGameID());
+        ChessGame chess = resp.game();
 
+        if (!username.equals(resp.whiteUsername()) && !username.equals(resp.blackUsername())) {
+            var errorNotification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+            errorNotification.addErrorMessage("Observers cannot resign.");
+            connections.sendBackToRootClient(command.getGameID(), username, errorNotification);
+            return;
+        }
+        if (chess.getIsOver()) {
+            var errorNotification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+            errorNotification.addErrorMessage("You cannot resign, the other team already resigned.");
+            connections.sendBackToRootClient(command.getGameID(), username, errorNotification);
+            return;
+        }
+
+        chess.setIsOver(true);
+        game.updateGameNewMove(chess, command.getGameID());
+
+        var allNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        var message = String.format("%s resigned. Game over.\n", username);
+        allNotification.addMessage(message);
+
+        connections.broadcast(command.getGameID(), null, allNotification);
+        connections.remove(command.getGameID(), username);
     }
-
-
-//    private void enter(String visitorName, Session session) throws IOException {
-//        connections.add(visitorName, session);
-//        var message = String.format("%s is in the shop", visitorName);
-//        var notification = new ServerMessage(ServerMessage.serverMessageType, message);
-//        connections.broadcast(visitorName, notification);
-//    }
-//
-//    private void exit(String visitorName) throws IOException {
-//        connections.remove(visitorName);
-//        var message = String.format("%s left the shop", visitorName);
-//        var notification = new ServerMessage(ServerMessage.Type.DEPARTURE, message);
-//        connections.broadcast(visitorName, notification);
-//    }
-//
-//    public void makeNoise(String petName, String sound) throws ResponseException {
-//        try {
-//            var message = String.format("%s says %s", petName, sound);
-//            var notification = new ServerMessage(ServerMessage.Type.NOISE, message);
-//            connections.broadcast("", notification);
-//        } catch (Exception ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
 }

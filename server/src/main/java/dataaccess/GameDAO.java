@@ -13,6 +13,6 @@ public interface GameDAO {
      int createGame(String gameName);
      void updateGame(int gameID, String playerColor, String username) throws AlreadyTakenException, BadReqException;
      void clear();
-
     void updateGameNewMove(ChessGame chess, Integer gameID);
+    void nullifyPlayer(int gameID, String color);
 }

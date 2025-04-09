@@ -72,4 +72,9 @@ public class MemoryGame implements GameDAO{
     @Override
     public void updateGameNewMove(ChessGame chess, Integer gameID) {
     }
+
+    @Override
+    public void nullifyPlayer(int gameID, String color) {
+
+    }
 }

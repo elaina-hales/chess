@@ -169,4 +169,22 @@ public class SQLGame implements GameDAO{
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void nullifyPlayer(int gameID, String color) {
+        var statement = "";
+        try (var conn = DatabaseManager.getConnection()) {
+            if (color.equals("WHITE")) {
+                statement = "UPDATE Game SET WhiteUsername=null WHERE GameID=?";
+            } else if (color.equals("BLACK")) {
+                statement = "UPDATE Game SET BlackUsername=null WHERE GameID=?";
+            }
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setInt(1, gameID);
+                preparedStatement.executeUpdate();
+            }
+        } catch (DataAccessException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
