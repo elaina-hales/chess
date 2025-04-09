@@ -9,6 +9,8 @@ import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import service.AlreadyTakenException;
+import service.BadReqException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -53,8 +55,8 @@ public class WebSocketHandler {
             switch (command.getCommandType()) {
                 case CONNECT -> connect(username, command);
                 case MAKE_MOVE -> makeMove(username, m);
-                case LEAVE -> leaveGame(session, username, command);
-                case RESIGN -> resign(session, username, command);
+                case LEAVE -> leaveGame(username, command);
+                case RESIGN -> resign(username, command);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -169,11 +171,24 @@ public class WebSocketHandler {
         }
     }
 
-    private void leaveGame(Session session, String username, UserGameCommand command) {
+    private void leaveGame(String username, UserGameCommand command) throws IOException, BadReqException, AlreadyTakenException {
+        GameData resp = game.getGame(command.getGameID());
+        ChessGame chess = resp.game();
+        connections.remove(command.getGameID(), username);
+
+        if (username.equals(resp.blackUsername())){
+            game.updateGame(command.getGameID(), "BLACK", null);
+        } else if (username.equals(resp.whiteUsername())) {
+            game.updateGame(command.getGameID(), "WHITE", null);
+        }
+        var allElseNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        var message = String.format("%s left the game.\n", username);
+        allElseNotification.addMessage(message);
+        connections.broadcast(command.getGameID(), username, allElseNotification);
 
     }
 
-    private void resign(Session session, String username, UserGameCommand command) {
+    private void resign(String username, UserGameCommand command) {
 
     }
 
