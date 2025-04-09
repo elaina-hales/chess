@@ -35,8 +35,8 @@ public class PostLogin {
             return switch (cmd) {
                 case "create" -> create(authToken, server, params);
                 case "list" -> list(server, authToken);
-                case "join" -> join(username, server, authToken, params);
-                case "observe" -> observe(username, params);
+                case "join" -> join(server, authToken, params);
+                case "observe" -> observe(authToken, params);
                 case "logout" -> logout(server, authToken);
                 case "quit" -> "quit";
                 default -> help();
@@ -103,7 +103,7 @@ public class PostLogin {
         }
     }
 
-    public static String join(String username, ServerFacade server, String authToken, String... params) {
+    public static String join(ServerFacade server, String authToken, String... params) {
         if (params.length >= 2) {
             try {
                 var player = params[1];
@@ -124,7 +124,7 @@ public class PostLogin {
                     }
                 }
                 return switch (statusCode) {
-                    case 200 -> successJoin(player, gameIDsAndTmpIDs.get(id), username);
+                    case 200 -> successJoin(player, gameIDsAndTmpIDs.get(id), authToken);
                     case 400 -> "Error: bad input. Expected: <id> <WHITE|BLACK>. Please try again.\n";
                     case 401 -> "You are unauthorized to do this. Please try again.\n";
                     case 403 -> "That color is already taken. Select a different color or game and try again.\n";
@@ -140,7 +140,7 @@ public class PostLogin {
         }
     }
 
-    public static String successJoin(String player, int gameID, String username) throws ResponseException {
+    public static String successJoin(String player, int gameID, String authToken) throws ResponseException {
         joined = GameState.JOINED_GAME;
         GameMenu.joined = GameState.JOINED_GAME;
         ChessGame.TeamColor current;
@@ -150,19 +150,24 @@ public class PostLogin {
             current = ChessGame.TeamColor.WHITE;
         }
         WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, new GameMenu(serverUrl));
-        ws.sendWsJoin(username, gameID);
+        ws.sendWsJoin(authToken, gameID);
         GameMenu.color = current;
+        waitForNotifications();
         return GameMenu.help();
     }
 
-    public static String observe(String username, String ... params) throws Exception {
+    public static String observe(String authToken, String ... params) throws Exception {
         if (params.length >= 1) {
             int id = Integer.parseInt(params[0]);
+            if (gameIDsAndTmpIDs.isEmpty()){
+                return "You must list available games before joining one. Enter 'list' to list available games.\n";
+            }
             WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, new GameMenu(serverUrl));
-            ws.sendWsJoin(username, gameIDsAndTmpIDs.get(id));
+            ws.sendWsJoin(authToken, gameIDsAndTmpIDs.get(id));
             isObserver = true;
             joined = GameState.JOINED_GAME;
             GameMenu.joined = GameState.JOINED_GAME;
+            waitForNotifications();
             return GameMenu.help();
         }
         throw new Exception("Error: bad input. Expected: <id>\n");
@@ -196,5 +201,13 @@ public class PostLogin {
                     quit - exit chess
                     help - possible commands
                 """;
+    }
+
+    public static void waitForNotifications() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

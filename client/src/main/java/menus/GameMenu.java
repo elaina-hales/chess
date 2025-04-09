@@ -9,7 +9,9 @@ import ui.DrawChessBoard;
 import websocket.ServerMessageObserver;
 import websocket.messages.ServerMessage;
 
-import javax.management.Notification;
+import static chess.ChessGame.TeamColor.BLACK;
+import static ui.EscapeSequences.*;
+
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -178,19 +180,29 @@ public class GameMenu implements ServerMessageObserver {
     }
 
     public void displayNotification(String message) {
-        System.out.println(message);
+        System.out.println(SET_TEXT_COLOR_BLUE + message);
+        System.out.print(RESET_TEXT_COLOR);
+        System.out.print("[LOGGED_IN] >>> ");
     }
 
     public void displayError(String message) {
-        System.out.println(message);
+        System.out.println(SET_TEXT_COLOR_BLUE + message);
+        System.out.print(RESET_TEXT_COLOR);
+        System.out.print("[LOGGED_IN] >>> ");
     }
 
     public void loadGame(ChessGame game){
         DrawChessBoard d = new DrawChessBoard();
+        String strColor;
+        if (color == BLACK){
+            strColor = "black";
+        } else  {
+            strColor = "white";
+        }
         if (isHighlight){
-            d.highlight(game, color.toString(), startPosition);
+            d.highlight(game, strColor, startPosition);
         } else {
-            d.draw(game, color.toString(), false);
+            d.draw(game, strColor, false);
         }
     }
 }

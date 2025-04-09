@@ -23,7 +23,6 @@ public class DrawChessBoard {
             ChessPosition pos = move.getEndPosition();
             endPositions.add(pos);
         }
-        System.out.println(endPositions);
         draw(chess, perspective, true);
     }
 
