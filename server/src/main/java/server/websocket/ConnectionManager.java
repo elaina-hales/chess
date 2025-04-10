@@ -12,7 +12,7 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final ConcurrentHashMap<Integer, Vector<Connection>> connections = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<Integer, Vector<Connection>> connections = new ConcurrentHashMap<>();
     private final Gson gson = new Gson();
 
     public void add(int gameID, String username, Session session) {
@@ -29,11 +29,14 @@ public class ConnectionManager {
 
     public void remove(int gameID, String visitorName) {
         Vector<Connection> gameCnxns = connections.get(gameID);
-        for (Connection cnxn : gameCnxns) {
-            if (cnxn.visitorName.equals(visitorName)) {
-                connections.get(gameID).remove(cnxn);
+        connections.remove(gameID);
+        Vector<Connection> newCnxns = new Vector<>();
+        for (Connection cnxn: gameCnxns) {
+            if (!cnxn.visitorName.equals(visitorName)) {
+                newCnxns.add(cnxn);
             }
         }
+        connections.put(gameID, newCnxns);
     }
 
     public void sendErrorToOneUser(Session session, ServerMessage notification) throws IOException {
