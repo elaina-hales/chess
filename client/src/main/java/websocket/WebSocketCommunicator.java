@@ -36,6 +36,7 @@ public class WebSocketCommunicator extends Endpoint {
                         ServerMessage msg = gson.fromJson(message, ServerMessage.class);
                         serverMessageObserver.notify(msg);
                     } catch(Exception ex) {
+                        ex.printStackTrace();
                         serverMessageObserver.notify(new ServerMessage(ServerMessage.ServerMessageType.ERROR));
                     }
                 }
@@ -61,7 +62,7 @@ public class WebSocketCommunicator extends Endpoint {
 
     public void sendWsMakeMove(String authToken, int gameID, ChessMove move) throws ResponseException {
         try {
-            var action = new MakeMoveCommand(MakeMoveCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
+            var action = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
@@ -72,6 +73,7 @@ public class WebSocketCommunicator extends Endpoint {
         try {
             var action = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authtoken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
+            this.session.close();
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
@@ -81,6 +83,7 @@ public class WebSocketCommunicator extends Endpoint {
         try {
             var action = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authtoken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
+            this.session.close();
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }

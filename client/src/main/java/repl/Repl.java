@@ -23,6 +23,7 @@ public class Repl {
     private final GameMenu gameMenu;
     private final PostLogin postMenu;
     private final PreLogin preMenu;
+    private int gameID;
 
 
     public Repl(String serverURL){
@@ -44,7 +45,7 @@ public class Repl {
                 if (state == LOGGED_IN) {
                     authToken = PreLogin.getToken();
                     if (joined == JOINED_GAME){
-                        result = gameMenu.eval(line, username, authToken, PostLogin.currentGameID);
+                        result = gameMenu.eval(line, username, authToken, gameID);
                         joined = gameMenu.joined;
                         System.out.print(result);
                     } else {
@@ -52,6 +53,9 @@ public class Repl {
                         System.out.print(result);
                         state = postMenu.state;
                         preMenu.state = state;
+                        if (PostLogin.currentGameID != null){
+                            gameID = PostLogin.currentGameID;
+                        }
                         joined = postMenu.joined;
                     }
                 } else {

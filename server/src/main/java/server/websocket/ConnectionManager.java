@@ -30,7 +30,7 @@ public class ConnectionManager {
         Vector<Connection> gameCnxns = connections.get(gameID);
         for (Connection cnxn : gameCnxns) {
             if (cnxn.visitorName.equals(visitorName)) {
-                gameCnxns.remove(cnxn);
+                connections.get(gameID).remove(cnxn);
             }
         }
     }
@@ -62,22 +62,6 @@ public class ConnectionManager {
                 if (!c.visitorName.equals(excludeVisitorName)) {
                     c.send(gson.toJson(notification));
                 }
-            } else {
-                removeList.add(c);
-            }
-        }
-
-        for (var c : removeList) {
-            connections.remove(c.visitorName);
-        }
-    }
-
-    public void broadcastToAll(int gameID, ServerMessage notification) throws IOException {
-        var removeList = new ArrayList<Connection>();
-        Vector<Connection> gameCnxns = connections.get(gameID);
-        for (var c : gameCnxns) {
-            if (c.session.isOpen()) {
-                c.send(gson.toJson(notification));
             } else {
                 removeList.add(c);
             }

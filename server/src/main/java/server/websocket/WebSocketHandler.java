@@ -171,7 +171,7 @@ public class WebSocketHandler {
         }
     }
 
-    private void leaveGame(String username, UserGameCommand command) throws IOException, BadReqException, AlreadyTakenException {
+    private void leaveGame(String username, UserGameCommand command) throws IOException  {
         GameData resp = game.getGame(command.getGameID());
 
         if (username.equals(resp.blackUsername())){

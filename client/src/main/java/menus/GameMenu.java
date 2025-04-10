@@ -87,6 +87,7 @@ public class GameMenu implements ServerMessageObserver {
         joined = GameState.NOT_JOINED;
         PostLogin.joined = GameState.NOT_JOINED;
         PostLogin.isObserver = false;
+        color = null;
         waitForNotifications();
         return "You have successfully left the game.\n";
     }
@@ -142,6 +143,7 @@ public class GameMenu implements ServerMessageObserver {
         int endRow = Character.getNumericValue(params[1].charAt(1));
         int endCol = colMap.get(e2);
         ChessPosition endPos = new ChessPosition(endRow, endCol);
+
         if (chess.getBoard().getPiece(startPos) == null) {
             return "There is no piece at your start position of" + params[0] + ".\n";
         } else if (chess.getBoard().getPiece(startPos).getTeamColor() != color) {
@@ -213,14 +215,10 @@ public class GameMenu implements ServerMessageObserver {
         String strColor;
         if (color == BLACK){
             strColor = "black";
-        } else  {
+        } else {
             strColor = "white";
         }
-        if (isHighlight){
-            d.highlight(game, strColor, startPosition);
-        } else {
-            d.draw(game, strColor, false);
-        }
+        d.draw(chess, strColor, false);
     }
 
     public static void waitForNotifications() {
