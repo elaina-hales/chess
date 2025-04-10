@@ -160,31 +160,31 @@ public class WebSocketHandler {
 
         var checkNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         if (chess.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-            checkNotification.addMessage("Black is now in checkmate!");
+            checkNotification.addMessage(username + " (black team) is now in checkmate!");
             connections.broadcast(command.getGameID(), null, checkNotification);
             return;
         }
         if (chess.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-            checkNotification.addMessage("White is now in checkmate!");
+            checkNotification.addMessage(username + " (white team) is now in checkmate!");
             connections.broadcast(command.getGameID(), null, checkNotification);
             return;
         }
         if (chess.isInStalemate(ChessGame.TeamColor.BLACK)) {
-            checkNotification.addMessage("White is now in stalemate!");
+            checkNotification.addMessage(username + " (black team) is now in stalemate!");
             connections.broadcast(command.getGameID(), null, checkNotification);
             return;
         }
         if (chess.isInStalemate(ChessGame.TeamColor.WHITE)) {
-            checkNotification.addMessage("White is now in stalemate!");
+            checkNotification.addMessage(username + " (white team) is now in stalemate!");
             connections.broadcast(command.getGameID(), null, checkNotification);
             return;
         }
         if (chess.isInCheck(ChessGame.TeamColor.BLACK)) {
-            checkNotification.addMessage("Black is now in check!");
+            checkNotification.addMessage(username + " (black team) is now in check!");
             connections.broadcast(command.getGameID(), null, checkNotification);
         }
         if (chess.isInCheck(ChessGame.TeamColor.WHITE)) {
-            checkNotification.addMessage("White is now in check!");
+            checkNotification.addMessage(username + " (white team) is now in check!");
             connections.broadcast(command.getGameID(), null, checkNotification);
         }
     }

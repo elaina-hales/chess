@@ -72,11 +72,19 @@ public class GameMenu implements ServerMessageObserver {
     }
 
     public String resign(String authtoken, int gameID) throws ResponseException {
-        ws.sendWsResign(authtoken, gameID);
-        if (!PostLogin.isObserver){
-            chess.setIsOver(true);
-            waitForNotifications();
-            return "You have successfully resigned.\n";
+        if (!PostLogin.isObserver) {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Are you sure you want to resign? (Y/N) ");
+            String line = scanner.nextLine();
+            if (line.equals("Y")) {
+                ws.sendWsResign(authtoken, gameID);
+                chess.setIsOver(true);
+                waitForNotifications();
+                return "You have successfully resigned.\n";
+            } else {
+                System.out.println("Resignation request canceled.");
+                return "";
+            }
         }
         return "";
     }
