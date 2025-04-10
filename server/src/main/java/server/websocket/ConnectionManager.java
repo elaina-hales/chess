@@ -9,9 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final HashMap<Integer, Vector<Connection>> connections = new HashMap<>();
+    public final ConcurrentHashMap<Integer, Vector<Connection>> connections = new ConcurrentHashMap<>();
     private final Gson gson = new Gson();
 
     public void add(int gameID, String username, Session session) {

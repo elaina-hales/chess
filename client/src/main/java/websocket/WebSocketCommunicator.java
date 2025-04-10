@@ -18,11 +18,10 @@ public class WebSocketCommunicator extends Endpoint {
     ServerMessageObserver serverMessageObserver;
 
 
-    public WebSocketCommunicator(String url, ServerMessageObserver serverMessageObserver) throws ResponseException {
+    public WebSocketCommunicator(String url) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "ws");
-            this.serverMessageObserver = serverMessageObserver;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
@@ -32,13 +31,8 @@ public class WebSocketCommunicator extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     Gson gson = new Gson();
-                    try {
-                        ServerMessage msg = gson.fromJson(message, ServerMessage.class);
-                        serverMessageObserver.notify(msg);
-                    } catch(Exception ex) {
-                        ex.printStackTrace();
-                        serverMessageObserver.notify(new ServerMessage(ServerMessage.ServerMessageType.ERROR));
-                    }
+                    ServerMessage msg = gson.fromJson(message, ServerMessage.class);
+                    serverMessageObserver.notify(msg);
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -87,5 +81,9 @@ public class WebSocketCommunicator extends Endpoint {
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
+    }
+
+    public void setObserver(ServerMessageObserver observer){
+        serverMessageObserver = observer;
     }
 }

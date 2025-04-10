@@ -29,8 +29,11 @@ public class GameMenu implements ServerMessageObserver {
     private static ChessPosition startPosition = new ChessPosition(-1, -1);
     private static ChessGame chess;
     private static final HashMap<String, ChessPiece.PieceType> pieceMap = new HashMap<>();
+    private WebSocketCommunicator ws;
 
-    public GameMenu(String serverUrl) {
+    public GameMenu(String serverUrl, WebSocketCommunicator cm) throws ResponseException {
+        ws = cm;
+        ws.setObserver(this);
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         colMap.put('a', 1);
@@ -69,7 +72,6 @@ public class GameMenu implements ServerMessageObserver {
     }
 
     public String resign(String authtoken, int gameID) throws ResponseException {
-        WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, this);
         ws.sendWsResign(authtoken, gameID);
         if (!PostLogin.isObserver){
             chess.setIsOver(true);
@@ -82,7 +84,6 @@ public class GameMenu implements ServerMessageObserver {
     }
 
     public String leave(String authtoken,  int gameID) throws ResponseException {
-        WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, this);
         ws.sendWsLeave(authtoken, gameID);
         joined = GameState.NOT_JOINED;
         PostLogin.joined = GameState.NOT_JOINED;
@@ -145,10 +146,9 @@ public class GameMenu implements ServerMessageObserver {
         ChessPosition endPos = new ChessPosition(endRow, endCol);
 
         if (chess.getBoard().getPiece(startPos) == null) {
-            return "There is no piece at your start position of" + params[0] + ".\n";
-        } else if (chess.getBoard().getPiece(startPos).getTeamColor() != color) {
-            return "The piece at your start position of" + params[0] + "is not your same team color.\n";
+            return "There is no piece at your start position.\n";
         }
+
         ChessMove move;
         if (chess.getBoard().getPiece(startPos).equals(ChessPiece.PieceType.PAWN) && endRow == 8) {
             String piece = params[2];
@@ -160,7 +160,6 @@ public class GameMenu implements ServerMessageObserver {
         } else {
             move = new ChessMove(startPos, endPos, null);
         }
-        WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, this);
         ws.sendWsMakeMove(authtoken, gameID, move);
         waitForNotifications();
         return "";

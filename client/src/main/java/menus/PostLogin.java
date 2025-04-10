@@ -6,8 +6,6 @@ import exception.ResponseException;
 import model.GameData;
 import repl.GameState;
 import repl.State;
-import ui.DrawChessBoard;
-import websocket.ServerMessageObserver;
 import websocket.WebSocketCommunicator;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,12 +18,12 @@ public class PostLogin {
     private static final HashMap<Integer, Integer> gameIDsAndTmpIDs = new HashMap<>();
     public static boolean isObserver = false;
     private static ServerFacade server;
-    private static String serverUrl;
     public static Integer currentGameID;
+    private WebSocketCommunicator ws;
 
-    public PostLogin(String serverUrl) {
+    public PostLogin(String serverUrl, WebSocketCommunicator cm) throws ResponseException {
+        ws = cm;
         server = new ServerFacade(serverUrl);
-        this.serverUrl = serverUrl;
     }
 
     public String eval(String input, String authToken, String username) {
@@ -151,21 +149,19 @@ public class PostLogin {
             current = ChessGame.TeamColor.WHITE;
         }
         currentGameID = gameID;
-        WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, new GameMenu(serverUrl));
         ws.sendWsJoin(authToken, gameID);
         GameMenu.color = current;
         waitForNotifications();
         return GameMenu.help();
     }
 
-    public static String observe(String authToken, String ... params) throws Exception {
+    public String observe(String authToken, String ... params) throws Exception {
         if (params.length >= 1) {
             int id = Integer.parseInt(params[0]);
             if (gameIDsAndTmpIDs.isEmpty()){
                 return "You must list available games before joining one. Enter 'list' to list available games.\n";
             }
             currentGameID = gameIDsAndTmpIDs.get(id);
-            WebSocketCommunicator ws = new WebSocketCommunicator(serverUrl, new GameMenu(serverUrl));
             ws.sendWsJoin(authToken, gameIDsAndTmpIDs.get(id));
             isObserver = true;
             joined = GameState.JOINED_GAME;

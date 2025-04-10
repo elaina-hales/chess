@@ -1,9 +1,11 @@
 package repl;
 
+import exception.ResponseException;
 import menus.GameMenu;
 import menus.PostLogin;
 import menus.PreLogin;
 import websocket.ServerMessageObserver;
+import websocket.WebSocketCommunicator;
 import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
@@ -26,9 +28,10 @@ public class Repl {
     private int gameID;
 
 
-    public Repl(String serverURL){
-        gameMenu = new GameMenu(serverURL);
-        postMenu = new PostLogin(serverURL);
+    public Repl(String serverURL) throws ResponseException {
+        WebSocketCommunicator ws = new WebSocketCommunicator(serverURL);
+        gameMenu = new GameMenu(serverURL, ws);
+        postMenu = new PostLogin(serverURL, ws);
         preMenu = new PreLogin(serverURL);
     }
 
