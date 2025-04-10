@@ -103,11 +103,11 @@ public class WebSocketHandler {
         }
 
         // if the observer tries to make a move
-        userType currentType;
+        UserType currentType;
         if (username.equals(resp.blackUsername())){
-            currentType = userType.BLACK;
+            currentType = UserType.BLACK;
         } else if (username.equals(resp.whiteUsername())) {
-            currentType = userType.WHITE;
+            currentType = UserType.WHITE;
         } else {
             var errorNotification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
             errorNotification.addErrorMessage("Observers cannot make moves.");
@@ -116,8 +116,8 @@ public class WebSocketHandler {
         }
 
 //         if the wrong team tries to make a move
-        if (((currentType == userType.BLACK) && (chess.getTeamTurn() != ChessGame.TeamColor.BLACK)) ||
-        ((currentType == userType.WHITE) && (chess.getTeamTurn() != ChessGame.TeamColor.WHITE))) {
+        if (((currentType == UserType.BLACK) && (chess.getTeamTurn() != ChessGame.TeamColor.BLACK)) ||
+        ((currentType == UserType.WHITE) && (chess.getTeamTurn() != ChessGame.TeamColor.WHITE))) {
             var errorNotification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
             errorNotification.addErrorMessage("It is not your turn to make a move.");
             connections.sendBackToRootClient(command.getGameID(), username, errorNotification);
