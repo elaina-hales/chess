@@ -145,11 +145,16 @@ public class GameMenu implements ServerMessageObserver {
         int endCol = colMap.get(e2);
         ChessPosition endPos = new ChessPosition(endRow, endCol);
 
+        ChessMove move = new ChessMove(startPos, endPos, null);
+
         if (chess.getBoard().getPiece(startPos) == null) {
             return "There is no piece at your start position.\n";
+        } else if (!chess.getBoard().getPiece(startPos).getTeamColor().equals(color)) {
+            return "Invalid move. The piece at your start position is not on your team.\n";
+        } if (!chess.validMoves(startPos).contains(move)) {
+            return "Invalid move. You may not move there.\n";
         }
 
-        ChessMove move;
         if (chess.getBoard().getPiece(startPos).equals(ChessPiece.PieceType.PAWN) && endRow == 8) {
             String piece = params[2];
             ChessPiece.PieceType pieceType = PIECE_MAP.get(piece);

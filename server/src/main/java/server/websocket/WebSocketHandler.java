@@ -2,6 +2,7 @@ package server.websocket;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPosition;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.*;
@@ -9,8 +10,6 @@ import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import service.AlreadyTakenException;
-import service.BadReqException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -80,12 +79,21 @@ public class WebSocketHandler {
             connections.sendBackToRootClient(command.getGameID(), username, errorNotification);
             return;
         }
+
+        String strColor;
+        if (resp.whiteUsername().equals(username)) {
+            strColor = "white";
+        } else if (resp.blackUsername().equals(username)) {
+            strColor = "black";
+        } else {
+            strColor = "observer";
+        }
         ChessGame currentGame = resp.game();
         rootNotification.addGame(currentGame);
         connections.sendBackToRootClient(command.getGameID(), username, rootNotification);
 
         var allElseNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-        var message = String.format("%s joined the game.\n", username);
+        var message = String.format("%s joined the game as %s.\n", username, strColor);
         allElseNotification.addMessage(message);
         connections.broadcast(command.getGameID(), username, allElseNotification);
     }
@@ -141,8 +149,13 @@ public class WebSocketHandler {
         allNotification.addGame(chess);
         connections.broadcast(command.getGameID(), null, allNotification);
 
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
+        String startPosition = getStringPosition(start);
+        String endPosition = getStringPosition(end);
+
         var allElseNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-        allElseNotification.addMessage(username + " made a move from "+ move.getStartPosition() + " to " + move.getEndPosition());
+        allElseNotification.addMessage(username + " made a move from " + startPosition + " to " + endPosition);
         connections.broadcast(command.getGameID(), username, allElseNotification);
 
         var checkNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
@@ -174,6 +187,21 @@ public class WebSocketHandler {
             checkNotification.addMessage("White is now in check!");
             connections.broadcast(command.getGameID(), null, checkNotification);
         }
+    }
+
+    private static String getStringPosition(ChessPosition end) {
+        String endPosition = switch (end.getColumn()) {
+            case 1 -> "a";
+            case 2 -> "b";
+            case 3 -> "c";
+            case 4 -> "d";
+            case 5 -> "e";
+            case 6 -> "f";
+            case 7 -> "g";
+            case 8 -> "h";
+            default -> throw new IllegalStateException("Unexpected value: " + end.getColumn());
+        };
+        return endPosition + String.valueOf(end.getRow());
     }
 
     private void leaveGame(String username, UserGameCommand command) throws IOException  {
