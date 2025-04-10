@@ -75,8 +75,6 @@ public class GameMenu implements ServerMessageObserver {
         ws.sendWsResign(authtoken, gameID);
         if (!PostLogin.isObserver){
             chess.setIsOver(true);
-            joined = GameState.NOT_JOINED;
-            PostLogin.joined = GameState.NOT_JOINED;
             waitForNotifications();
             return "You have successfully resigned.\n";
         }
