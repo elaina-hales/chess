@@ -74,6 +74,11 @@ public class WebSocketHandler {
             errorNotification.addErrorMessage("Error: Invalid gameID.");
             connections.sendBackToRootClient(command.getGameID(), username, errorNotification);
             return;
+        } else if (resp.game().getIsOver()) {
+            var errorNotification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+            errorNotification.addErrorMessage("Error: This game is already over. You may not join.");
+            connections.sendBackToRootClient(command.getGameID(), username, errorNotification);
+            return;
         }
         ChessGame currentGame = resp.game();
         rootNotification.addGame(currentGame);
