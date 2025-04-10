@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public class PostLogin {
     public static State state = State.LOGGED_IN;
     public static GameState joined = GameState.NOT_JOINED;
-    private static final HashMap<Integer, Integer> gameIDsAndTmpIDs = new HashMap<>();
+    private static final HashMap<Integer, Integer> GAME_ID_TMP_ID = new HashMap<>();
     public static boolean isObserver = false;
     private static ServerFacade server;
     public static Integer currentGameID;
@@ -66,7 +66,7 @@ public class PostLogin {
         StringBuilder result = new StringBuilder();
         int index = 1;
         for (GameData game: body.games()) {
-            gameIDsAndTmpIDs.put(index, game.gameID());
+            GAME_ID_TMP_ID.put(index, game.gameID());
             result.append(index).append(". ");
             result.append(game.gameName()).append("\n\tWhite player: ");
             if (game.whiteUsername() != null) {
@@ -113,17 +113,17 @@ public class PostLogin {
                     statusCode = 400;
                 } else {
                     id = Integer.parseInt(params[0]);
-                    if (gameIDsAndTmpIDs.isEmpty()){
+                    if (GAME_ID_TMP_ID.isEmpty()){
                         statusCode = 800;
-                    } else if (id > gameIDsAndTmpIDs.size()) {
+                    } else if (id > GAME_ID_TMP_ID.size()) {
                         statusCode = 900;
                     } else {
-                        r = server.join(authToken, gameIDsAndTmpIDs.get(id), player);
+                        r = server.join(authToken, GAME_ID_TMP_ID.get(id), player);
                         statusCode = r.statusCode();
                     }
                 }
                 return switch (statusCode) {
-                    case 200 -> successJoin(player, gameIDsAndTmpIDs.get(id), authToken);
+                    case 200 -> successJoin(player, GAME_ID_TMP_ID.get(id), authToken);
                     case 400 -> "Error: bad input. Expected: <id> <WHITE|BLACK>. Please try again.\n";
                     case 401 -> "You are unauthorized to do this. Please try again.\n";
                     case 403 -> "That color is already taken. Select a different color or game and try again.\n";
@@ -158,11 +158,11 @@ public class PostLogin {
     public String observe(String authToken, String ... params) throws Exception {
         if (params.length >= 1) {
             int id = Integer.parseInt(params[0]);
-            if (gameIDsAndTmpIDs.isEmpty()){
+            if (GAME_ID_TMP_ID.isEmpty()){
                 return "You must list available games before joining one. Enter 'list' to list available games.\n";
             }
-            currentGameID = gameIDsAndTmpIDs.get(id);
-            ws.sendWsJoin(authToken, gameIDsAndTmpIDs.get(id));
+            currentGameID = GAME_ID_TMP_ID.get(id);
+            ws.sendWsJoin(authToken, GAME_ID_TMP_ID.get(id));
             isObserver = true;
             joined = GameState.JOINED_GAME;
             GameMenu.joined = GameState.JOINED_GAME;

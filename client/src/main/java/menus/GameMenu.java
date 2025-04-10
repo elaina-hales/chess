@@ -28,7 +28,7 @@ public class GameMenu implements ServerMessageObserver {
     private static boolean isHighlight = false;
     private static ChessPosition startPosition = new ChessPosition(-1, -1);
     private static ChessGame chess;
-    private static final HashMap<String, ChessPiece.PieceType> pieceMap = new HashMap<>();
+    private static final HashMap<String, ChessPiece.PieceType> PIECE_MAP = new HashMap<>();
     private WebSocketCommunicator ws;
 
     public GameMenu(String serverUrl, WebSocketCommunicator cm) throws ResponseException {
@@ -45,10 +45,10 @@ public class GameMenu implements ServerMessageObserver {
         colMap.put('g', 7);
         colMap.put('h', 8);
 
-        pieceMap.put("Q", ChessPiece.PieceType.QUEEN);
-        pieceMap.put("B", ChessPiece.PieceType.BISHOP);
-        pieceMap.put("R", ChessPiece.PieceType.ROOK);
-        pieceMap.put("K", ChessPiece.PieceType.KNIGHT);
+        PIECE_MAP.put("Q", ChessPiece.PieceType.QUEEN);
+        PIECE_MAP.put("B", ChessPiece.PieceType.BISHOP);
+        PIECE_MAP.put("R", ChessPiece.PieceType.ROOK);
+        PIECE_MAP.put("K", ChessPiece.PieceType.KNIGHT);
     }
 
     public String eval(String input, String givenUsername, String authtoken, int gameID) {
@@ -152,7 +152,7 @@ public class GameMenu implements ServerMessageObserver {
         ChessMove move;
         if (chess.getBoard().getPiece(startPos).equals(ChessPiece.PieceType.PAWN) && endRow == 8) {
             String piece = params[2];
-            ChessPiece.PieceType pieceType = pieceMap.get(piece);
+            ChessPiece.PieceType pieceType = PIECE_MAP.get(piece);
             if (pieceType == null) {
                 return "Promotion Piece Type not found. Try again \n";
             }
@@ -178,7 +178,8 @@ public class GameMenu implements ServerMessageObserver {
         return """
                     redraw - board
                     leave - the game
-                    move <start> <end> <promotion piece (optional)> - If you are promoting your pawn, include the first letter of the piece you are promoting to.
+                    move <start> <end> <promotion piece (optional)> -
+                        If you are promoting your pawn, include the first letter of the piece you are promoting to.
                         Q = Queen, B = Bishop, R = Rook, K = Knight
                     resign - forfeit and leave the game
                     highlight <position> - highlight possible moves for a piece given its start position

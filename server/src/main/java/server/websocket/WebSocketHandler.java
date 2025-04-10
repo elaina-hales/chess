@@ -24,7 +24,7 @@ public class WebSocketHandler {
     private final AuthDAO auth = new SQLAuth();
     private final GameDAO game = new SQLGame();
     private final Gson g = new Gson();
-    private enum userType {
+    private enum UserType {
         OBSERVER,
         WHITE,
         BLACK

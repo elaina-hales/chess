@@ -56,9 +56,7 @@ public class Repl {
                         System.out.print(result);
                         state = postMenu.state;
                         preMenu.state = state;
-                        if (PostLogin.currentGameID != null){
-                            gameID = PostLogin.currentGameID;
-                        }
+                        getGameID();
                         joined = postMenu.joined;
                     }
                 } else {
@@ -81,5 +79,11 @@ public class Repl {
             }
         }
         System.out.println();
+    }
+
+    private void getGameID() {
+        if (PostLogin.currentGameID != null){
+            gameID = PostLogin.currentGameID;
+        }
     }
 }
